@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SpringTable Studio</title><style>/*STYLE*/</style></head>
+<body>
+<header class="mast">
+  <div class="brand"><span class="brandmark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M5 23 24 13c4-2 2-5-2-3L9 16c-4 2-5-1-2-3l17-8M8 27l16-8c4-2 2-5-2-3l-11 5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span><h1>SpringTable <span>Studio</span></h1></div>
+  <div class="file-tools"><button id="open"><i data-icon="folder"></i>Open</button><button id="save" class="primary"><i data-icon="download"></i>Save project</button><input id="file" type="file" accept=".json,application/json" hidden></div>
+</header>
+<main class="shell">
+  <div class="subhead"><div class="tabs" aria-label="Workspace">
+    <button data-tab="play" class="selected"><i data-icon="play"></i>Play</button>
+    <button data-tab="layout"><i data-icon="layout"></i>Layout</button>
+    <button data-tab="lab"><i data-icon="wave"></i>Pattern lab</button>
+  </div><label class="project-label">Project <input id="project-label" aria-label="Project name" maxlength="80" value="Studio table"></label></div>
+  <div class="workarea">
+    <section class="stage-card" aria-label="Table simulator">
+      <div class="stage-heading"><div><h2>Table preview</h2><span id="geometry-caption" class="geometry-caption"></span></div><div class="stage-controls"><button id="pause" class="on-dark"><i data-icon="pause"></i><span>Pause</span></button><button id="step" class="on-dark" hidden>+16 ms</button></div></div>
+      <div class="canvas-wrap"><canvas id="board" tabindex="0" aria-label="Virtual spring table. Use arrows to select a spring, hold Enter to touch it, or tap Space to pluck."></canvas></div>
+      <div class="stage-footer"><span class="stage-hint" id="stage-hint"><i data-icon="pointer"></i>Brush a spring to pluck it</span><div class="camera"><button id="smaller" title="Zoom out" aria-label="Zoom out">−</button><button id="fit" title="Fit table to view">Fit</button><button id="bigger" title="Zoom in" aria-label="Zoom in">+</button></div></div>
+    </section>
+    <aside class="inspector">
+      <section id="pane-play">
+        <div class="panel-title"><i data-icon="sliders"></i><h2>Play controls</h2></div>
+        <div class="control-group"><label for="pattern">Pattern</label><select id="pattern"></select><p id="pattern-info" class="help"></p><p id="effect-count" class="mono" hidden></p></div>
+        <div class="control-group"><h3>Interaction</h3><div class="paired"><button id="demo"><i data-icon="play"></i><span>Run demo</span></button><button id="all"><i data-icon="touch"></i><span>Touch all</span></button></div>
+          <button id="pick-pair" aria-pressed="false" class="wide pair-pick" hidden><i data-icon="touch"></i>Pick two springs</button>
+        </div>
+        <div id="interference-colors" class="control-group" hidden>
+          <label for="wave-palette">Wave palette</label><select id="wave-palette"></select>
+          <p id="random-palette-hint" class="help" hidden>Each new pair gets two fresh colors. The swatches show the latest pair.</p>
+          <div class="field-pair palette-fields">
+            <div><label for="crest-color">Crest</label><div class="palette-swatch"><input id="crest-color" type="color"><code id="crest-hex"></code></div></div>
+            <div><label for="trough-color">Trough</label><div class="palette-swatch"><input id="trough-color" type="color"><code id="trough-hex"></code></div></div>
+          </div>
+          <button id="keep-colors" type="button" class="wide pair-pick" hidden>Keep these colors</button>
+          <details class="palette-detail"><summary>Teensy command</summary><code id="teensy-palette"></code></details>
+        </div>
+        <div class="control-group"><label for="budget">LED current budget <span class="unit">amps</span></label><div class="sliderline"><input id="budget-range" aria-label="LED current budget in amps" type="range" min="0.1" max="60" step="0.1"><input id="budget" type="number" min="0.1" max="60" step="0.1" value="40"></div><p class="help">The entire frame dims together above this estimated load.</p></div>
+        <div class="control-group last"><div class="group-title"><h3>Pixel inspector</h3><span class="mono" id="inspect-ring"></span></div><div id="pixel-strip" aria-label="Select a pixel"></div><div class="rgb-read"><span id="led-number"></span><code id="pixel-value"></code></div></div>
+      </section>
+      <section id="pane-layout" hidden>
+        <div class="panel-title"><i data-icon="layout"></i><h2>Layout editor</h2></div>
+        <div class="control-group"><label for="arrangement">Arrangement</label><select id="arrangement"><option value="grid">Rectangular grid</option><option value="hex">Hexagonal lattice</option><option value="circle">Circle</option><option value="spiral">Spiral</option><option value="custom" disabled>Custom layout</option></select>
+          <div id="grid-inputs" class="field-pair"><label>Rows<input id="rows" type="number" min="1" max="32"></label><label>Columns<input id="cols" type="number" min="1" max="32"></label></div>
+          <label id="count-field" class="subfield" hidden>Ring count<input id="count" type="number" min="1" max="400"></label>
+          <label for="spacing" class="subfield"><span id="spacing-label">Center spacing</span> <span class="unit">mm</span></label><div class="sliderline"><input id="spacing-range" aria-label="Layout spacing in millimeters" type="range" min="20" max="300" step="1"><input id="spacing" type="number" min="20" max="300" step="1"></div>
+          <p class="help">The firmware grid corresponds to 60 mm here. Moving springs changes how long a wave takes to reach them.</p>
+        </div>
+        <div class="control-group"><h3>Canvas tool</h3><div class="paired"><button id="move"><i data-icon="move"></i>Move</button><button id="add"><i data-icon="plus"></i>Add ring</button></div></div>
+        <div class="control-group last"><div class="group-title"><h3>Selected ring</h3><span id="layout-ring" class="mono"></span></div><div class="field-pair"><label>X · mm<input id="coord-x" type="number" step="1"></label><label>Y · mm<input id="coord-y" type="number" step="1"></label></div><div class="paired actions"><button id="remove"><i data-icon="minus"></i>Remove</button><button id="undo"><i data-icon="undo"></i>Undo layout</button></div></div>
+      </section>
+      <section id="pane-lab" hidden>
+        <div class="panel-title"><i data-icon="wave"></i><h2>Pattern lab</h2></div>
+        <div class="control-group"><label for="drafts">Pattern to edit</label><select id="drafts"></select></div>
+        <div class="control-group">
+          <label for="lab-name">Name</label><input id="lab-name" maxlength="45" value="Echo bloom">
+          <label class="subfield" for="lab-kind">Pattern type</label><select id="lab-kind"><option value="wave">Touch wave</option><option value="formula">Pixel formulas</option></select>
+          <div id="wave-fields"><div class="field-pair"><label>Wave shape<select id="wave-shape"><option value="radial">Circular</option><option value="square">Square</option></select></label><label>Color<input id="wave-color" type="color" value="#fd925a"></label></div>
+            <div class="field-pair"><label>Speed · mm/s<input id="wave-speed" type="number" min="10" max="5000" value="450"></label><label>Reach · mm<input id="wave-reach" type="number" min="1" max="5000" value="225"></label></div>
+            <div class="field-pair"><label>Trail · ms<input id="wave-width" type="number" min="10" max="5000" value="320"></label><label>Held glow · %<input id="wave-hold" type="number" min="0" max="100" value="10"></label></div>
+          </div>
+          <div id="formula-fields" hidden><p class="help">One expression per color channel, from 0 to 255.</p><label>Red<textarea id="expr-r" rows="2" spellcheck="false"></textarea></label><label>Green<textarea id="expr-g" rows="2" spellcheck="false"></textarea></label><label>Blue<textarea id="expr-b" rows="2" spellcheck="false"></textarea></label>
+            <details><summary>Variables &amp; functions</summary><p>Ring <code>i</code>, LED <code>p</code> (0–15), coordinates <code>x,y</code> in mm, time <code>t</code> in seconds. <code>held</code> is 1 during contact. <code>age</code> is seconds since this ring was pressed. <code>dt</code> and <code>d</code> are time in seconds and distance in mm from the latest press anywhere. Before a first press, its age is −1.</p><p>Use +, − (typed as -), *, /, %, comparisons, parentheses, <code>pi</code>, <code>sin</code>, <code>cos</code>, <code>abs</code>, <code>floor</code>, <code>min</code>, <code>max</code>, <code>clamp(v,lo,hi)</code>, and <code>if(test,yes,no)</code>.</p></details>
+          </div>
+          <p id="lab-error" class="error" role="alert"></p><button id="apply" class="primary wide"><i data-icon="play"></i>Apply &amp; test pattern</button><p class="help">Custom patterns are saved in your Studio project.</p>
+        </div>
+      </section>
+    </aside>
+  </div>
+  <section class="meter" aria-label="Simulation telemetry">
+    <div class="metric"><span class="metric-label"><span class="signal-dot"></span>Requested</span><b id="requested">1.60 <small>A</small></b></div>
+    <div class="metric output"><span class="metric-label">LED output</span><b id="sent">1.60 <small>A</small></b><div class="bar"><div id="powerbar"></div></div></div>
+    <div class="metric"><span class="metric-label">Frame scale</span><b id="scale">100 <small>%</small></b></div>
+    <div class="metric"><span class="metric-label">Touches</span><b id="touches">0</b></div>
+  </section>
+  <div class="foot"><span>Current values are estimates.</span><span id="message" role="status"></span></div>
+</main><noscript>Enable JavaScript to use the spring table simulator.</noscript>
+<script>/*SCRIPTS*/</script></body></html>

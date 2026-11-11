@@ -1,0 +1,5 @@
+# Keep the standalone Studio build reproducible on Windows and Unix.
+studio/** text eol=lf
+"SpringTable Studio.html" text eol=lf
+*.gif binary
+*.png binary

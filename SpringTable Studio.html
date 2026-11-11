@@ -1,0 +1,2126 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SpringTable Studio</title><style>:root{--paper:#f4f3ed;--ink:#20312c;--muted:#56655e;--line:#d7dbcf;--green:#255747;--accent:#c9e69b;--stage:#141c1d;--mono:"IBM Plex Mono",Consolas,"Courier New",monospace;font-family:"Instrument Sans",Inter,"Segoe UI",sans-serif;color:var(--ink);background:#eaece4;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0}button,input,select,textarea{font:inherit;color:inherit}button{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:transparent;border:1px solid #c9cfc3;border-radius:7px;padding:9px 13px;font-size:13px;font-weight:600;cursor:pointer;transition:background .12s,border-color .12s}button:hover{background:#dfe7da;border-color:#a4b39f}button:disabled{cursor:default;opacity:.45}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid #4f8066;outline-offset:3px}button.primary{background:var(--green);border-color:var(--green);color:white}button.primary:hover{background:#174536}.primary.wide{width:100%;margin-top:12px}i{display:inline-flex;flex:none;width:16px;height:16px}i svg{width:100%;height:100%}h1,h2,h3,p{margin:0}[hidden]{display:none!important}
+.mast{height:76px;padding:0 clamp(16px,3.2vw,55px);display:flex;align-items:center;justify-content:space-between;background:#f6f6ef;border-bottom:1px solid var(--line);gap:12px}.brand,.file-tools,.tabs,.stage-controls,.stage-hint,.group-title,.paired,.camera,.panel-title,.brandmark,.stage-heading>div:first-child,.metric-label,.subhead{display:flex;align-items:center}.brand{gap:12px}.brandmark{width:37px;height:37px;background:#286046;border-radius:10px;justify-content:center;color:#daf2b7}.brandmark svg{width:28px}.brand h1{font-size:clamp(22px,2.1vw,30px);letter-spacing:-1.25px;font-weight:720;line-height:1}.brand h1 span{color:#556b5e;font-weight:430}.file-tools{gap:8px}.file-tools button{min-height:38px}.shell{max-width:1880px;margin:auto;padding:0 clamp(12px,3.2vw,55px) 12px}.subhead{min-height:69px;justify-content:space-between;gap:12px}.tabs{gap:5px}.tabs button{border-color:transparent;color:#56665c;font-weight:570}.tabs button.selected{color:#244a35;background:#d4e3ca;border:1px solid #bed0b5}.project-label,.mono,.geometry-caption,.metric-label,.rgb-read,.foot,.stage-hint,.camera,.unit{font-family:var(--mono)}.project-label{font-size:12px;color:#54635a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40%}.workarea{display:grid;grid-template-columns:minmax(0,1fr) clamp(292px,25vw,364px);gap:16px;align-items:stretch}.stage-card,.inspector{height:clamp(505px,calc(100dvh - 271px),935px);border-radius:13px;overflow:hidden}.stage-card{background:var(--stage);color:#ebf0e5;display:flex;flex-direction:column;border:1px solid #202d2c}.stage-heading{min-height:62px;padding:13px 19px;display:flex;align-items:center;justify-content:space-between;background:#192322;border-bottom:1px solid #35413d;gap:10px}.stage-heading>div:first-child{gap:12px;flex-wrap:wrap}.stage-heading h2{font-size:19px;font-weight:560;letter-spacing:-.45px}.geometry-caption{font-size:11px;color:#a9b7ab}.stage-controls{gap:5px}.on-dark,.camera button{border:1px solid #42504b;color:#dae5d8;background:#24312d;font-size:12px;padding:6px 9px}.on-dark:hover,.camera button:hover{background:#394b41;border-color:#607366}.on-dark i{width:13px;height:13px}.canvas-wrap{position:relative;flex:1;min-height:0}.canvas-wrap canvas{display:block;width:100%;height:100%;touch-action:none;user-select:none;-webkit-user-select:none;outline:none}.canvas-wrap canvas:focus-visible{outline:2px solid #a3c7a9;outline-offset:-3px}.stage-footer{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:48px;padding:6px 15px;background:#192322;border-top:1px solid #35413d}.stage-hint{color:#bac8bb;font-size:11px;gap:8px;line-height:1.4}.stage-hint i{width:14px;color:var(--accent)}.camera{gap:0}.camera button{border-radius:0;min-width:28px;min-height:28px;padding:4px 7px}.camera button+button{border-left:0}.camera button:first-child{border-radius:5px 0 0 5px}.camera button:last-child{border-radius:0 5px 5px 0}
+.inspector{border:1px solid #cbd0c3;background:var(--paper);padding:0 20px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#bac2b1 transparent}.panel-title{min-height:62px;gap:9px;border-bottom:1px solid var(--line)}.panel-title i{color:#50745a}.panel-title h2{font-size:19px;line-height:1.25;letter-spacing:-.5px}.control-group{padding:17px 0;border-bottom:1px solid var(--line)}.control-group.last,.control-group:last-child{border-bottom:0}.control-group h3,.control-group label,.group-title{font-weight:650;font-size:13px}.control-group label,.control-group h3{display:block;margin:0 0 9px}.control-group label.subfield{margin-top:14px}.control-group input:not([type=range]),select,textarea{width:100%;font-size:13px;border:1px solid #c5cec0;border-radius:6px;background:#fcfcf8;min-height:36px;padding:6px 9px;line-height:1.4}select{cursor:pointer}.control-group input[type=color]{padding:3px;height:37px;cursor:pointer}.unit{float:right;font-weight:400;font-size:11px;color:var(--muted)}.help,details p{font-size:12px;color:var(--muted);line-height:1.5;margin:8px 0 0}.paired,.sliderline,.field-pair{display:flex;gap:8px}.paired button{flex:1;min-width:0;font-size:12px;padding:8px 5px}.paired button.active{border-color:#739278;background:#dbe9d5;color:#264c34}.sliderline{align-items:center}.sliderline input[type=number]{width:65px}.sliderline input[type=range]{flex:1;width:0;accent-color:#527d57;cursor:pointer}.field-pair{margin-top:12px}.field-pair label{flex:1;min-width:0;font-size:12px;color:var(--muted);margin:0}.field-pair input,.field-pair select,.subfield input{display:block;margin-top:5px}.actions{margin-top:12px}.group-title{justify-content:space-between;gap:5px}.group-title h3{margin:0}.mono,.rgb-read{font-size:11px;font-weight:450;color:#4f6458}.rgb-read{display:flex;justify-content:space-between;margin-top:8px}.rgb-read code{font:inherit;color:var(--ink)}#pixel-strip{display:grid;grid-template-columns:repeat(16,minmax(0,1fr));gap:2px;margin-top:12px}#pixel-strip button{padding:0;min-width:0;height:19px;border:1px solid #aab5a4;border-radius:3px}#pixel-strip button.sel{outline:2px solid #597756;outline-offset:1px}textarea{font-family:var(--mono);font-size:12px;resize:vertical}details{margin-top:10px;font-size:12px}summary{cursor:pointer}details code{font-family:var(--mono);color:#324939}.error{color:#9e3229;font-size:12px;margin-top:8px}.error:empty{display:none}
+.meter{display:grid;grid-template-columns:1.05fr 1.45fr 1fr .72fr;border:1px solid #cbd0c3;background:var(--paper);border-radius:11px;margin-top:14px;padding:14px 0}.metric{padding:0 19px;display:flex;flex-direction:column;position:relative;gap:3px;min-width:0}.metric+.metric{border-left:1px solid var(--line)}.metric-label{font-size:10px;color:#617263;letter-spacing:.04em;gap:7px}.signal-dot{width:7px;height:7px;background:#699577;border-radius:50%}.metric b{font-family:var(--mono);font-size:21px;letter-spacing:-.7px;font-weight:600;white-space:nowrap}.metric b small{font-size:12px;color:#627767;font-weight:500}.bar{position:absolute;left:53%;right:16px;bottom:9px;height:6px;border-radius:5px;background:#dce2d4;overflow:hidden}.bar div{background:#769e67;height:100%;width:0}.bar.limited div{background:#bd702b}.foot{font-size:10px;color:#59665c;display:flex;justify-content:space-between;padding:9px 1px;gap:8px}#message{text-align:right}
+@media(max-width:880px){.shell{padding-left:12px;padding-right:12px}.workarea{gap:10px;grid-template-columns:minmax(0,1fr) 280px}.inspector{padding:0 14px}.stage-heading{padding:10px 12px}.stage-heading>div:first-child{gap:4px;flex-direction:column;align-items:flex-start}.metric{padding:0 11px}.stage-footer{padding:6px 9px}.stage-hint{font-size:10px}}
+@media(max-width:700px){.mast{height:61px;padding:0 12px}.brand{gap:7px}.brand h1{font-size:21px;letter-spacing:-.85px}.brandmark{width:29px;height:29px;border-radius:7px}.brandmark svg{width:22px}.file-tools{gap:4px}.file-tools button{font-size:12px;min-height:32px;padding:6px 8px}.file-tools i{width:13px}.subhead{min-height:52px}.tabs{gap:0}.tabs button{font-size:12px;padding:7px 9px}.project-label{display:none}.workarea{display:flex;flex-direction:column}.stage-card{height:clamp(330px,65svh,600px)}.stage-heading{min-height:47px}.stage-heading>div:first-child{flex-direction:row;align-items:center;gap:8px}.stage-heading h2{font-size:16px}.geometry-caption{font-size:10px}.stage-footer{min-height:39px}.inspector{height:auto;max-height:none;padding:0 16px}.panel-title{min-height:44px}.panel-title h2{font-size:16px}.control-group{padding:13px 0}.meter{grid-template-columns:1fr 1fr 1fr .7fr;padding:10px 0;margin-top:10px}.metric{padding:0 7px}.metric-label{font-size:8px;letter-spacing:0}.metric b{font-size:15px}.metric small{font-size:10px}.bar{display:none}.foot{font-size:9px}.stage-hint{max-width:70%}}
+@media(max-width:365px){.file-tools button i,.tabs i{display:none}.brand h1{font-size:18px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+.project-label input{max-width:150px;width:18ch;font-family:inherit;font-size:inherit;text-align:right;border:1px solid transparent;border-radius:4px;padding:4px;background:transparent;color:#314b3d}.project-label input:hover,.project-label input:focus{background:var(--paper);border-color:#c7d1bf}
+#pixel-strip button{transition:none}
+#effect-count{margin-top:9px}
+.pair-pick{margin-top:8px;width:100%}.pair-pick[aria-pressed=true]{border-color:#739278;background:#dbe9d5}
+.palette-fields>div{flex:1;min-width:0}.palette-fields label{margin-bottom:5px}.palette-swatch{display:flex;align-items:center;gap:6px}
+.palette-swatch input[type=color]{width:35px;height:32px;min-height:32px;margin:0;padding:2px;cursor:pointer}
+.palette-swatch code,.palette-detail code{font:11px var(--mono);color:var(--ink)}.palette-detail code{display:block;margin-top:6px;user-select:all}
+</style></head>
+<body>
+<header class="mast">
+  <div class="brand"><span class="brandmark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M5 23 24 13c4-2 2-5-2-3L9 16c-4 2-5-1-2-3l17-8M8 27l16-8c4-2 2-5-2-3l-11 5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span><h1>SpringTable <span>Studio</span></h1></div>
+  <div class="file-tools"><button id="open"><i data-icon="folder"></i>Open</button><button id="save" class="primary"><i data-icon="download"></i>Save project</button><input id="file" type="file" accept=".json,application/json" hidden></div>
+</header>
+<main class="shell">
+  <div class="subhead"><div class="tabs" aria-label="Workspace">
+    <button data-tab="play" class="selected"><i data-icon="play"></i>Play</button>
+    <button data-tab="layout"><i data-icon="layout"></i>Layout</button>
+    <button data-tab="lab"><i data-icon="wave"></i>Pattern lab</button>
+  </div><label class="project-label">Project <input id="project-label" aria-label="Project name" maxlength="80" value="Studio table"></label></div>
+  <div class="workarea">
+    <section class="stage-card" aria-label="Table simulator">
+      <div class="stage-heading"><div><h2>Table preview</h2><span id="geometry-caption" class="geometry-caption"></span></div><div class="stage-controls"><button id="pause" class="on-dark"><i data-icon="pause"></i><span>Pause</span></button><button id="step" class="on-dark" hidden>+16 ms</button></div></div>
+      <div class="canvas-wrap"><canvas id="board" tabindex="0" aria-label="Virtual spring table. Use arrows to select a spring, hold Enter to touch it, or tap Space to pluck."></canvas></div>
+      <div class="stage-footer"><span class="stage-hint" id="stage-hint"><i data-icon="pointer"></i>Brush a spring to pluck it</span><div class="camera"><button id="smaller" title="Zoom out" aria-label="Zoom out">−</button><button id="fit" title="Fit table to view">Fit</button><button id="bigger" title="Zoom in" aria-label="Zoom in">+</button></div></div>
+    </section>
+    <aside class="inspector">
+      <section id="pane-play">
+        <div class="panel-title"><i data-icon="sliders"></i><h2>Play controls</h2></div>
+        <div class="control-group"><label for="pattern">Pattern</label><select id="pattern"></select><p id="pattern-info" class="help"></p><p id="effect-count" class="mono" hidden></p></div>
+        <div class="control-group"><h3>Interaction</h3><div class="paired"><button id="demo"><i data-icon="play"></i><span>Run demo</span></button><button id="all"><i data-icon="touch"></i><span>Touch all</span></button></div>
+          <button id="pick-pair" aria-pressed="false" class="wide pair-pick" hidden><i data-icon="touch"></i>Pick two springs</button>
+        </div>
+        <div id="interference-colors" class="control-group" hidden>
+          <label for="wave-palette">Wave palette</label><select id="wave-palette"></select>
+          <p id="random-palette-hint" class="help" hidden>Each new pair gets two fresh colors. The swatches show the latest pair.</p>
+          <div class="field-pair palette-fields">
+            <div><label for="crest-color">Crest</label><div class="palette-swatch"><input id="crest-color" type="color"><code id="crest-hex"></code></div></div>
+            <div><label for="trough-color">Trough</label><div class="palette-swatch"><input id="trough-color" type="color"><code id="trough-hex"></code></div></div>
+          </div>
+          <button id="keep-colors" type="button" class="wide pair-pick" hidden>Keep these colors</button>
+          <details class="palette-detail"><summary>Teensy command</summary><code id="teensy-palette"></code></details>
+        </div>
+        <div class="control-group"><label for="budget">LED current budget <span class="unit">amps</span></label><div class="sliderline"><input id="budget-range" aria-label="LED current budget in amps" type="range" min="0.1" max="60" step="0.1"><input id="budget" type="number" min="0.1" max="60" step="0.1" value="40"></div><p class="help">The entire frame dims together above this estimated load.</p></div>
+        <div class="control-group last"><div class="group-title"><h3>Pixel inspector</h3><span class="mono" id="inspect-ring"></span></div><div id="pixel-strip" aria-label="Select a pixel"></div><div class="rgb-read"><span id="led-number"></span><code id="pixel-value"></code></div></div>
+      </section>
+      <section id="pane-layout" hidden>
+        <div class="panel-title"><i data-icon="layout"></i><h2>Layout editor</h2></div>
+        <div class="control-group"><label for="arrangement">Arrangement</label><select id="arrangement"><option value="grid">Rectangular grid</option><option value="hex">Hexagonal lattice</option><option value="circle">Circle</option><option value="spiral">Spiral</option><option value="custom" disabled>Custom layout</option></select>
+          <div id="grid-inputs" class="field-pair"><label>Rows<input id="rows" type="number" min="1" max="32"></label><label>Columns<input id="cols" type="number" min="1" max="32"></label></div>
+          <label id="count-field" class="subfield" hidden>Ring count<input id="count" type="number" min="1" max="400"></label>
+          <label for="spacing" class="subfield"><span id="spacing-label">Center spacing</span> <span class="unit">mm</span></label><div class="sliderline"><input id="spacing-range" aria-label="Layout spacing in millimeters" type="range" min="20" max="300" step="1"><input id="spacing" type="number" min="20" max="300" step="1"></div>
+          <p class="help">The firmware grid corresponds to 60 mm here. Moving springs changes how long a wave takes to reach them.</p>
+        </div>
+        <div class="control-group"><h3>Canvas tool</h3><div class="paired"><button id="move"><i data-icon="move"></i>Move</button><button id="add"><i data-icon="plus"></i>Add ring</button></div></div>
+        <div class="control-group last"><div class="group-title"><h3>Selected ring</h3><span id="layout-ring" class="mono"></span></div><div class="field-pair"><label>X · mm<input id="coord-x" type="number" step="1"></label><label>Y · mm<input id="coord-y" type="number" step="1"></label></div><div class="paired actions"><button id="remove"><i data-icon="minus"></i>Remove</button><button id="undo"><i data-icon="undo"></i>Undo layout</button></div></div>
+      </section>
+      <section id="pane-lab" hidden>
+        <div class="panel-title"><i data-icon="wave"></i><h2>Pattern lab</h2></div>
+        <div class="control-group"><label for="drafts">Pattern to edit</label><select id="drafts"></select></div>
+        <div class="control-group">
+          <label for="lab-name">Name</label><input id="lab-name" maxlength="45" value="Echo bloom">
+          <label class="subfield" for="lab-kind">Pattern type</label><select id="lab-kind"><option value="wave">Touch wave</option><option value="formula">Pixel formulas</option></select>
+          <div id="wave-fields"><div class="field-pair"><label>Wave shape<select id="wave-shape"><option value="radial">Circular</option><option value="square">Square</option></select></label><label>Color<input id="wave-color" type="color" value="#fd925a"></label></div>
+            <div class="field-pair"><label>Speed · mm/s<input id="wave-speed" type="number" min="10" max="5000" value="450"></label><label>Reach · mm<input id="wave-reach" type="number" min="1" max="5000" value="225"></label></div>
+            <div class="field-pair"><label>Trail · ms<input id="wave-width" type="number" min="10" max="5000" value="320"></label><label>Held glow · %<input id="wave-hold" type="number" min="0" max="100" value="10"></label></div>
+          </div>
+          <div id="formula-fields" hidden><p class="help">One expression per color channel, from 0 to 255.</p><label>Red<textarea id="expr-r" rows="2" spellcheck="false"></textarea></label><label>Green<textarea id="expr-g" rows="2" spellcheck="false"></textarea></label><label>Blue<textarea id="expr-b" rows="2" spellcheck="false"></textarea></label>
+            <details><summary>Variables &amp; functions</summary><p>Ring <code>i</code>, LED <code>p</code> (0–15), coordinates <code>x,y</code> in mm, time <code>t</code> in seconds. <code>held</code> is 1 during contact. <code>age</code> is seconds since this ring was pressed. <code>dt</code> and <code>d</code> are time in seconds and distance in mm from the latest press anywhere. Before a first press, its age is −1.</p><p>Use +, − (typed as -), *, /, %, comparisons, parentheses, <code>pi</code>, <code>sin</code>, <code>cos</code>, <code>abs</code>, <code>floor</code>, <code>min</code>, <code>max</code>, <code>clamp(v,lo,hi)</code>, and <code>if(test,yes,no)</code>.</p></details>
+          </div>
+          <p id="lab-error" class="error" role="alert"></p><button id="apply" class="primary wide"><i data-icon="play"></i>Apply &amp; test pattern</button><p class="help">Custom patterns are saved in your Studio project.</p>
+        </div>
+      </section>
+    </aside>
+  </div>
+  <section class="meter" aria-label="Simulation telemetry">
+    <div class="metric"><span class="metric-label"><span class="signal-dot"></span>Requested</span><b id="requested">1.60 <small>A</small></b></div>
+    <div class="metric output"><span class="metric-label">LED output</span><b id="sent">1.60 <small>A</small></b><div class="bar"><div id="powerbar"></div></div></div>
+    <div class="metric"><span class="metric-label">Frame scale</span><b id="scale">100 <small>%</small></b></div>
+    <div class="metric"><span class="metric-label">Touches</span><b id="touches">0</b></div>
+  </section>
+  <div class="foot"><span>Current values are estimates.</span><span id="message" role="status"></span></div>
+</main><noscript>Enable JavaScript to use the spring table simulator.</noscript>
+<script>(() => {
+  'use strict';
+  // Distances are millimeters and times are milliseconds. The grid uses the
+  // same physical emitter positions, trajectories and falloff as the firmware.
+  const LIFE = 4400, FADE = 2600, MAX_BALLS = 128;
+  const PAD = 20, LED_RADIUS = 17, LIGHT = 52, LIGHT2 = LIGHT * LIGHT;
+  const TAP_AGES = [0, 65, 130], TAP_WEIGHTS = [1, 125 / 255, 52 / 255];
+  const directions = Array.from({length: 16}, (_, p) => {
+    const angle = 2 * Math.PI * p / 16;
+    return [LED_RADIUS * Math.sin(angle), -LED_RADIUS * Math.cos(angle)];
+  });
+
+  function hull(points) {
+    const sorted = points.slice().sort((a, b) => a.x - b.x || a.y - b.y)
+      .filter((p, i, a) => !i || p.x !== a[i-1].x || p.y !== a[i-1].y);
+    if (sorted.length <= 2) return sorted;
+    function chain(order) {
+      const out = [];
+      for (const p of order) {
+        while (out.length >= 2) {
+          const a = out[out.length-2], b = out[out.length-1];
+          // Treat sub-micron floating point variation along a straight layout
+          // as collinear instead of producing an almost infinitely sharp tip.
+          const dx = b.x-a.x, dy = b.y-a.y;
+          if (dx*(p.y-a.y) - dy*(p.x-a.x) > 1e-8*Math.hypot(dx,dy)) break;
+          out.pop();
+        }
+        out.push(p);
+      }
+      out.pop();  // Both chains contribute their first endpoint.
+      return out;
+    }
+    return chain(sorted).concat(chain(sorted.reverse()));
+  }
+
+  function makeArena(points) {
+    const corners = hull(points);
+    if (!corners.length) return null;
+    const axesAligned = corners.every((p, i) => {
+      const next = corners[(i + 1) % corners.length];
+      return p.x === next.x || p.y === next.y;
+    });
+    if (axesAligned) {
+      const xs = corners.map(p => p.x), ys = corners.map(p => p.y);
+      return {rect: [Math.min(...xs)-PAD, Math.max(...xs)+PAD,
+                     Math.min(...ys)-PAD, Math.max(...ys)+PAD]};
+    }
+    // Each half-plane is described by its inward unit normal and a point on
+    // the original outline. Adjacent outward-shifted planes meet at a corner.
+    if (corners.length === 2) {
+      const [a, b] = corners, length = Math.hypot(b.x-a.x, b.y-a.y);
+      const dx = (b.x-a.x)/length, dy = (b.y-a.y)/length;
+      return {walls: [
+        {x: a.x, y: a.y, nx: dx, ny: dy}, {x: b.x, y: b.y, nx: -dx, ny: -dy},
+        {x: a.x, y: a.y, nx: -dy, ny: dx}, {x: a.x, y: a.y, nx: dy, ny: -dx}
+      ]};
+    }
+    const walls = corners.map((p, i) => {
+      const q = corners[(i+1) % corners.length], dx = q.x-p.x, dy = q.y-p.y;
+      const length = Math.hypot(dx, dy);
+      return {x: p.x, y: p.y, nx: -dy/length, ny: dx/length};
+    });
+    return {walls};
+  }
+
+  // Custom outlines use an exact piecewise-linear trajectory. Compute the
+  // reflection points once on launch so sparse or paused frames can seek
+  // directly to the head and both trail positions without stepping physics.
+  function reflectedPath(ball, walls) {
+    let {x,y,vx,vy} = ball, at = 0;
+    const pieces = [];
+    while (at < LIFE) {
+      pieces.push({at, x, y, vx, vy});
+      let first = Infinity, face = null, corner = false;
+      for (const wall of walls) {
+        const towards = -(vx*wall.nx + vy*wall.ny);
+        if (towards <= 1e-12) continue;
+        const gap = (x-wall.x)*wall.nx + (y-wall.y)*wall.ny + PAD;
+        const time = Math.max(0, gap / towards);
+        if (time < first - 1e-7) { first = time; face = wall; corner = false; }
+        else if (Math.abs(first-time) <= 1e-7) corner = true;
+      }
+      if (!face || at + first >= LIFE) break;
+      x += vx * first; y += vy * first; at += first;
+      if (corner) { vx = -vx; vy = -vy; }
+      else {
+        const normal = vx * face.nx + vy * face.ny;
+        vx -= 2 * normal * face.nx;
+        vy -= 2 * normal * face.ny;
+      }
+      // Advance an imperceptible distance along the reflected path to avoid
+      // re-hitting a vertex through floating-point cancellation.
+      x += vx * 1e-7; y += vy * 1e-7; at += 1e-7;
+    }
+    return pieces;
+  }
+
+  function mirror(value, min, max) {
+    const width = max-min, period = 2*width;
+    let folded = (value-min) % period;
+    if (folded < 0) folded += period;
+    return min + (folded > width ? period-folded : folded);
+  }
+
+  function location(ball, arena, age) {
+    if (arena.rect) {
+      const [left,right,top,bottom] = arena.rect;
+      return [mirror(ball.x+ball.vx*age, left,right), mirror(ball.y+ball.vy*age, top,bottom)];
+    }
+    const path = ball.path;
+    let lo = 0, hi = path.length;
+    while (lo+1 < hi) {
+      const mid = (lo+hi) >> 1;
+      if (path[mid].at <= age) lo = mid;
+      else hi = mid;
+    }
+    const p = path[lo], dt = age-p.at;
+    return [p.x+p.vx*dt, p.y+p.vy*dt];
+  }
+
+  class Ricochet {
+    constructor(rings, palette, seed) {
+      this.arena = makeArena(rings);
+      this.palette = palette;
+      this.balls = [];
+      this.setSeed(seed);
+      const count = rings.length * 16;
+      this.x = new Float64Array(count);
+      this.y = new Float64Array(count);
+      this.peaks = new Float64Array(count);
+      this.indices = new Uint32Array(count);
+      this.cells = new Map();
+      for (let i = 0; i < count; i++) {
+        const ring = rings[i >> 4], [dx,dy] = directions[i & 15];
+        const x = this.x[i] = ring.x+dx, y = this.y[i] = ring.y+dy;
+        const key = Math.floor(x/LIGHT) + ',' + Math.floor(y/LIGHT);
+        let cell = this.cells.get(key);
+        if (!cell) this.cells.set(key, cell = []);
+        cell.push(i);
+      }
+    }
+
+    setSeed(seed) { this.seed = (seed >>> 0) || 0x6d2b79f5; }
+
+    next() {
+      let value = this.seed;
+      value ^= value << 13; value ^= value >>> 17; value ^= value << 5;
+      this.seed = value >>> 0;
+      return this.seed;
+    }
+
+    launch(origin, time) {
+      const angle = (this.next() & 65535) * 2 * Math.PI / 65536;
+      const speed = (430 + this.next() % 211) / 1000;
+      const ball = {born: time >>> 0, x: origin.x, y: origin.y,
+        vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, color: this.palette[this.next() % 6]};
+      if (!this.arena.rect) ball.path = reflectedPath(ball, this.arena.walls);
+      if (this.balls.length === MAX_BALLS) this.balls.shift();
+      this.balls.push(ball);
+    }
+
+    deposit(x, y, weight, count) {
+      const left = Math.floor((x-LIGHT)/LIGHT), top = Math.floor((y-LIGHT)/LIGHT);
+      // Cell size equals kernel radius; only three cells on each axis can
+      // intersect a tap. Each emitter lives in exactly one cell.
+      for (let cy = top; cy <= top+2; cy++) {
+        for (let cx = left; cx <= left+2; cx++) {
+          const cell = this.cells.get(cx + ',' + cy);
+          if (!cell) continue;
+          for (const i of cell) {
+            const dx = this.x[i]-x, dy = this.y[i]-y;
+            const strength = weight * (1-(dx*dx+dy*dy)/LIGHT2);
+            if (strength <= this.peaks[i]) continue;
+            if (this.peaks[i] === 0) this.indices[count++] = i;
+            this.peaks[i] = strength;
+          }
+        }
+      }
+      return count;
+    }
+
+    render(now, pixels) {
+      let active = 0;
+      for (const ball of this.balls) {
+        const age = (now - ball.born) >>> 0;
+        if (age >= LIFE) continue;
+        this.balls[active++] = ball;
+        const fade = age <= FADE ? 1 : (LIFE-age)/(LIFE-FADE);
+        let count = 0;
+        for (let tap = 0; tap < TAP_AGES.length && TAP_AGES[tap] <= age; tap++) {
+          const [x,y] = location(ball, this.arena, age-TAP_AGES[tap]);
+          count = this.deposit(x,y,TAP_WEIGHTS[tap],count);
+        }
+        for (let j = 0; j < count; j++) {
+          const i = this.indices[j], strength = this.peaks[i]*fade;
+          this.peaks[i] = 0;
+          for (let ch = 0; ch < 3; ch++) {
+            const offset = i*3+ch;
+            pixels[offset] = Math.min(255,pixels[offset]+Math.round(ball.color[ch]*strength));
+          }
+        }
+      }
+      this.balls.length = active;
+      return active;
+    }
+  }
+  window.SpringRicochet = Ricochet;
+})();
+
+(() => {
+  'use strict';
+  const ORBIT_MS = 1800, FLASH_HOLD_MS = 80, FLASH_FADE_MS = 360;
+  const LIFE = ORBIT_MS + FLASH_HOLD_MS + FLASH_FADE_MS, MAX_ORBITS = 128;
+  const TAP_DELAYS = [0,45,90], TAP_WEIGHTS = [1,0.55,0.23];
+  const mid = 17 * Math.sin(Math.PI / 4), low = 17 * Math.sin(Math.PI / 8);
+  const high = 17 * Math.sin(3 * Math.PI / 8);
+  const offsets = [0,low,mid,high,17,high,mid,low,0,-low,-mid,-high,-17,-high,-mid,-low];
+  const boxDistance = (node, x, y) => {
+    const dx = Math.max(0, node.left-x, x-node.right);
+    const dy = Math.max(0, node.top-y, y-node.bottom);
+    return dx*dx + dy*dy;
+  };
+
+  // An orbit can cross empty space away from any ring. A bounded spatial
+  // search finds the nearest actual LED and then the complete illuminated
+  // neighborhood, even for hollow circles and widely separated islands.
+  class Emitters {
+    constructor(rings) {
+      const n = rings.length*16;
+      this.x = new Float64Array(n);
+      this.y = new Float64Array(n);
+      for (let i=0; i<n; i++) {
+        const ring = rings[i >> 4];
+        this.x[i] = ring.x+offsets[i & 15];
+        this.y[i] = ring.y-offsets[(i+4) & 15];
+      }
+      this.root = n ? this.partition(Array.from({length:n}, (_,i)=>i)) : null;
+    }
+
+    partition(indices) {
+      const node = {left:Infinity, right:-Infinity, top:Infinity, bottom:-Infinity};
+      for (const i of indices) {
+        node.left = Math.min(node.left,this.x[i]); node.right = Math.max(node.right,this.x[i]);
+        node.top = Math.min(node.top,this.y[i]); node.bottom = Math.max(node.bottom,this.y[i]);
+      }
+      if (indices.length <= 16) node.indices = indices;
+      else {
+        const coord = node.right-node.left >= node.bottom-node.top ? this.x : this.y;
+        indices.sort((a,b)=>coord[a]-coord[b]);
+        const split = indices.length >> 1;
+        node.a = this.partition(indices.slice(0,split));
+        node.b = this.partition(indices.slice(split));
+      }
+      return node;
+    }
+
+    nearest(node, x, y, best) {
+      if (boxDistance(node,x,y) >= best) return best;
+      if (node.indices) {
+        for (const i of node.indices) {
+          const dx = this.x[i]-x, dy = this.y[i]-y;
+          best = Math.min(best,dx*dx+dy*dy);
+        }
+        return best;
+      }
+      // Visit the nearer child first so its result prunes the farther one.
+      const aFirst = boxDistance(node.a,x,y) <= boxDistance(node.b,x,y);
+      best = this.nearest(aFirst ? node.a : node.b,x,y,best);
+      return this.nearest(aFirst ? node.b : node.a,x,y,best);
+    }
+
+    matching(node, x, y, limit, visit) {
+      if (boxDistance(node,x,y) >= limit) return;
+      if (node.indices) {
+        for (const i of node.indices) {
+          const dx = this.x[i]-x, dy = this.y[i]-y, d2 = dx*dx+dy*dy;
+          if (d2 < limit) visit(i,d2);
+        }
+      } else {
+        this.matching(node.a,x,y,limit,visit);
+        this.matching(node.b,x,y,limit,visit);
+      }
+    }
+
+    spot(x, y, width, visit) {
+      if (!this.root) return;
+      const nearest = this.nearest(this.root,x,y,Infinity);
+      const width2 = width*width;
+      this.matching(this.root,x,y,nearest+width2,(i,d2)=>visit(i,1-(d2-nearest)/width2));
+    }
+  }
+
+  class Drain {
+    constructor(rings) {
+      let left=Infinity, right=-Infinity, top=Infinity, bottom=-Infinity;
+      for (const r of rings) {
+        left=Math.min(left,r.x); right=Math.max(right,r.x);
+        top=Math.min(top,r.y); bottom=Math.max(bottom,r.y);
+      }
+      this.cx = rings.length ? (left+right)/2 : 0;
+      this.cy = rings.length ? (top+bottom)/2 : 0;
+      this.orbits = [];
+      this.emitters = new Emitters(rings);
+      this.peaks = new Float64Array(rings.length*16);
+      this.indices = new Uint32Array(this.peaks.length);
+      this.flash = [];
+      this.emitters.spot(this.cx,this.cy,32,(i,strength)=>this.flash.push({i,strength}));
+    }
+
+    launch(ring, color, now) {
+      const dx = ring.x-this.cx, dy = ring.y-this.cy;
+      const r = Math.hypot(dx,dy), central = r < 1e-6;
+      if (this.orbits.length === MAX_ORBITS) this.orbits.shift();
+      this.orbits.push({born:now >>> 0, color, radius:central ? 17 : r,
+                        theta:central ? -Math.PI/2 : Math.atan2(dy,dx)});
+    }
+
+    comet(orbit, age, pixels) {
+      let count = 0;
+      for (let tap=0; tap<TAP_DELAYS.length && age>=TAP_DELAYS[tap]; tap++) {
+        const u = (age-TAP_DELAYS[tap])/ORBIT_MS;
+        const r = orbit.radius*(1-u);
+        const theta = orbit.theta + 2*Math.PI*(0.9*u + 2.25*u*u);
+        const x = this.cx+r*Math.cos(theta), y = this.cy+r*Math.sin(theta);
+        const width = 20+Math.min(26,0.10*r);
+        this.emitters.spot(x,y,width,(i,base)=>{
+          const strength = base*TAP_WEIGHTS[tap];
+          if (strength <= this.peaks[i]) return;
+          if (!this.peaks[i]) this.indices[count++] = i;
+          this.peaks[i] = strength;
+        });
+      }
+      for (let j=0; j<count; j++) {
+        const i = this.indices[j], strength = this.peaks[i];
+        this.peaks[i] = 0;
+        for (let ch=0; ch<3; ch++) {
+          const off=i*3+ch;
+          pixels[off] = Math.min(255,pixels[off]+Math.round(orbit.color[ch]*strength));
+        }
+      }
+    }
+
+    render(now, pixels) {
+      let active = 0;
+      for (const orbit of this.orbits) {
+        const age = (now-orbit.born) >>> 0;
+        if (age >= LIFE) continue;
+        this.orbits[active++] = orbit;
+        if (age < ORBIT_MS) this.comet(orbit,age,pixels);
+        else {
+          const fade = Math.min(1,(LIFE-age)/FLASH_FADE_MS);
+          for (const {i,strength} of this.flash) {
+            const white = Math.round(255*strength*fade), offset = i*3;
+            for (let ch=0; ch<3; ch++) pixels[offset+ch] = Math.min(255,pixels[offset+ch]+white);
+          }
+        }
+      }
+      this.orbits.length = active;
+      return active;
+    }
+  }
+  window.SpringDrain = Drain;
+})();
+
+(() => {
+  'use strict';
+  const PAD_MM = 19, MAX_WAVES = 128;
+  const scale = (code, level) => Math.floor((code*level+127)/255);
+  const pulse = (age, peak, width) => {
+    const t = age-peak;
+    return t < 0 || t >= width ? 0 : Math.floor(255*(width-t)/width);
+  };
+
+  // Only discard collinearity within floating-point roundoff. A physically
+  // narrow triangle still has two distinct sides for calculating a return.
+  function hull(rings) {
+    const sorted = rings.slice().sort((a,b)=>a.x-b.x || a.y-b.y)
+      .filter((p,i,a)=>!i || p.x!==a[i-1].x || p.y!==a[i-1].y);
+    if (sorted.length < 3) return sorted;
+    function half(points) {
+      const chain = [];
+      for (const p of points) {
+        while (chain.length > 1) {
+          const a = chain[chain.length-2], b = chain[chain.length-1];
+          const left = (b.x-a.x)*(p.y-a.y), right = (b.y-a.y)*(p.x-a.x);
+          if (left-right > 8*Number.EPSILON*(Math.abs(left)+Math.abs(right))) break;
+          chain.pop();
+        }
+        chain.push(p);
+      }
+      chain.pop();
+      return chain;
+    }
+    return half(sorted).concat(half(sorted.reverse()));
+  }
+
+  class Outline {
+    constructor(rings) {
+      this.points = hull(rings);
+      this.edges = this.points.map((p,i) => {
+        const q = this.points[(i+1) % this.points.length];
+        return {p, q, nx:p.y-q.y, ny:q.x-p.x};
+      });
+      // This also covers horizontal and vertical single-row boards.
+      if (this.points.length && this.edges.every(e=>!e.nx || !e.ny)) {
+        const xs=this.points.map(p=>p.x), ys=this.points.map(p=>p.y);
+        this.rect = [Math.min(...xs),Math.max(...xs),Math.min(...ys),Math.max(...ys)];
+      }
+    }
+
+    rayFrom(source) {
+      if (this.rect) {
+        const [left,right,top,bottom] = this.rect;
+        return (dx,dy,d) => {
+          const tx = dx ? ((dx>0 ? right : left)-source.x)/dx : Infinity;
+          const ty = dy ? ((dy>0 ? bottom : top)-source.y)/dy : Infinity;
+          return Math.max(d,Math.min(tx,ty)*d);
+        };
+      }
+      if (this.points.length === 2) {
+        const [a,b] = this.points;
+        return (dx,dy,d) => Math.max(d, ((a.x-source.x)*dx+(a.y-source.y)*dy)/d,
+                                           ((b.x-source.x)*dx+(b.y-source.y)*dy)/d);
+      }
+
+      const faces = this.edges.map(e=>({...e, gap:(source.x-e.p.x)*e.nx+(source.y-e.p.y)*e.ny}));
+      // On detailed hulls, index edges by angle as seen from this source. A
+      // sector includes its neighbors to keep grazing and vertex hits covered.
+      const sectors = faces.length > 12 ? this.indexFaces(faces,source) : null;
+      return (dx,dy,d) => {
+        const candidates = sectors ? sectors[this.sector(dx,dy)] : faces;
+        let t = this.exitFactor(candidates,dx,dy);
+        if (!Number.isFinite(t) && sectors) t=this.exitFactor(faces,dx,dy);
+        return Number.isFinite(t) ? Math.max(d,t*d) : d;
+      };
+    }
+
+    sector(dx,dy) {
+      const n = Math.floor(Math.atan2(dy,dx)*(32/Math.PI));
+      return (n+64) % 64;
+    }
+
+    indexFaces(faces, source) {
+      const sectors = Array.from({length:64},()=>[]);
+      for (const face of faces) {
+        const ax=face.p.x-source.x, ay=face.p.y-source.y;
+        const bx=face.q.x-source.x, by=face.q.y-source.y;
+        if ((ax===0 && ay===0) || (bx===0 && by===0)) continue;
+        const first = this.sector(ax,ay), last = this.sector(bx,by);
+        const count = Math.min(64, ((last-first+64)%64)+3);
+        for (let i=0;i<count;i++) sectors[(first-1+i+64)%64].push(face);
+      }
+      return sectors;
+    }
+
+    exitFactor(faces,dx,dy) {
+      let t=Infinity;
+      for (const {nx,ny,gap} of faces) {
+        const du=dx*nx, dv=dy*ny, towards=-(du+dv);
+        if (towards > 8*Number.EPSILON*(Math.abs(du)+Math.abs(dv))) t=Math.min(t,gap/towards);
+      }
+      return t;
+    }
+  }
+
+  class Reflection {
+    constructor(rings, distances) {
+      this.rings=rings;
+      this.distances=distances;
+      this.outline=new Outline(rings);
+      this.routes=new Map();
+      this.waves=[];
+      this.colors=new Uint8Array(rings.length*3);
+    }
+
+    route(index) {
+      if (this.routes.has(index)) return this.routes.get(index);
+      const source=this.rings[index], distances=this.distances[index].radial;
+      let farthest=0;
+      for (const d of distances) farthest=Math.max(farthest,d);
+      const centerPeak=Math.max(220,Math.round((farthest+PAD_MM)*(1000/600+1000/1500)));
+      const route = {out:new Uint32Array(distances.length), back:new Uint32Array(distances.length),
+                     distances, lifetime:centerPeak+160};
+      const exit=this.outline.rayFrom(source);
+      for (let i=0;i<distances.length;i++) {
+        const d=distances[i];
+        route.out[i]=Math.round(d*1000/600);
+        if (d===0) { route.back[i]=centerPeak; continue; }
+        const dx=this.rings[i].x-source.x, dy=this.rings[i].y-source.y;
+        // The hull lies inside the farthest-vertex circle around this source.
+        // Clamp roundoff on nearly parallel edges before converting to time.
+        const edge=Math.min(farthest,exit(dx,dy,d))+PAD_MM;
+        route.back[i]=Math.round((edge/600+(edge-d)/1500)*1000);
+      }
+      this.routes.set(index,route);
+      return route;
+    }
+
+    launch(index,color,now) {
+      if (this.waves.length===MAX_WAVES) this.waves.shift();
+      this.waves.push({born:now>>>0, route:this.route(index), color,
+                       echo:color.map(code=>Math.floor((2*code+255)/3))});
+    }
+
+    render(now,pixels) {
+      const colors=this.colors;
+      colors.fill(0);
+      let active=0;
+      for (const wave of this.waves) {
+        const age=(now-wave.born)>>>0, route=wave.route;
+        if (age>=route.lifetime) continue;
+        this.waves[active++]=wave;
+        for (let i=0;i<this.rings.length;i++) {
+          const out=pulse(age,route.out[i],140);
+          const back=pulse(age,route.back[i],route.distances[i]===0 ? 160 : 100);
+          if (!out && !back) continue;
+          for (let ch=0;ch<3;ch++) {
+            const amount=Math.max(scale(wave.color[ch],out),scale(wave.echo[ch],back));
+            const off=i*3+ch;
+            colors[off]=Math.min(255,colors[off]+amount);
+          }
+        }
+      }
+      this.waves.length=active;
+      for (let i=0;i<this.rings.length;i++) {
+        const color=colors.subarray(i*3,i*3+3);
+        for (let p=0;p<16;p++) pixels.set(color,(i*16+p)*3);
+      }
+      return active;
+    }
+  }
+  window.SpringReflection=Reflection;
+})();
+
+(() => {
+  'use strict';
+  const PERIOD = 400, PACKET_MS = 1600, MAX_PACKETS = 128;
+  const DEFAULT_COLORS = Object.freeze({crest:Object.freeze([40,210,255]), trough:Object.freeze([95,65,190])});
+
+  function rgbTriplet(value) {
+    if (!(Array.isArray(value) || ArrayBuffer.isView(value)) || value.length !== 3) {
+      throw new RangeError('An interference color needs three RGB channel codes');
+    }
+    const copy = Array.from(value);
+    if (!copy.every(code => Number.isInteger(code) && code >= 0 && code <= 255)) {
+      throw new RangeError('Interference RGB channel codes must be integers from 0 to 255');
+    }
+    return Object.freeze(copy);
+  }
+
+  function hueRGB(hue) {
+    const m = Math.floor((223*(hue%256)+127)/255);
+    const up=32+m, down=255-m;
+    switch (Math.floor(hue/256)) {
+      case 0: return [255,up,32];
+      case 1: return [down,255,32];
+      case 2: return [32,255,up];
+      case 3: return [32,down,255];
+      case 4: return [up,32,255];
+      default: return [255,32,down];
+    }
+  }
+
+  const equalRGB = (a,b) => a[0]===b[0] && a[1]===b[1] && a[2]===b[2];
+
+  class GroupPalette {
+    constructor(manual = DEFAULT_COLORS) {
+      this.manual = this.current = manual;
+      this.random = false;
+      this.seed = null;
+      this.lastHue = null;
+      this.group = null;
+    }
+
+    setSeed(seed) {
+      this.seed = (seed >>> 0) || 0x6d2b79f5;
+      this.lastHue = this.group = null;
+    }
+
+    nextWord() {
+      if (this.seed === null) {
+        const word = globalThis.crypto?.getRandomValues(new Uint32Array(1))[0] ??
+                     Math.floor(Math.random()*0x100000000);
+        this.seed = word || 0x6d2b79f5;
+      }
+      let x = this.seed;
+      x ^= x << 13; x ^= x >>> 17; x ^= x << 5;
+      return this.seed = x >>> 0;
+    }
+
+    roll() {
+      const word=this.nextWord();
+      let h = this.lastHue===null ? word%1536 : (this.lastHue+384+word%769)%1536;
+      let other = (h+640+this.nextWord()%257)%1536;
+      let crest=hueRGB(h), trough=hueRGB(other);
+      while (equalRGB(crest,this.current.crest) || equalRGB(trough,this.current.trough)) {
+        h=(h+384)%1536; other=(other+384)%1536;
+        crest=hueRGB(h); trough=hueRGB(other);
+      }
+      this.lastHue=h;
+      this.current=Object.freeze({crest:Object.freeze(crest),trough:Object.freeze(trough)});
+    }
+
+    edge(index, now, otherHeld) {
+      if (!this.random) return this.manual;
+      const group=this.group;
+      if (!group || (!otherHeld && (group.multiple || index===group.first ||
+                                    ((now-group.start)>>>0)>=250))) {
+        this.roll();
+        this.group={first:index,start:now>>>0,multiple:false};
+      } else if (index!==group.first) group.multiple=true;
+      return this.current;
+    }
+  }
+
+  // Mirror one quarter-cycle so equal-strength samples half a period apart
+  // cancel exactly. Fade rounding treats crests and troughs symmetrically.
+  const quarter = Int16Array.from({length:101}, (_,i)=>
+    Math.floor(120*Math.cos(Math.PI*i/200)+0.5));
+  const packet = Int16Array.from({length:PACKET_MS}, (_,t)=>{
+    const p=t%PERIOD;
+    let v;
+    if (p<100) v=quarter[p];
+    else if (p<200) v=-quarter[200-p];
+    else if (p<300) v=-quarter[p-200];
+    else v=quarter[400-p];
+    const envelope=Math.min(400,PACKET_MS-t);
+    return Math.sign(v)*Math.floor((Math.abs(v)*envelope+200)/400);
+  });
+
+  class Interference {
+    static newPalette(manual) { return new GroupPalette(manual); }
+
+    static colors(crest, trough) {
+      return Object.freeze({crest:rgbTriplet(crest), trough:rgbTriplet(trough)});
+    }
+
+    constructor(distances, reflection = null) {
+      this.distances=distances;
+      this.reflection=reflection;
+      this.routes=new Map();
+      this.waves=[];
+      // At most 128 direct and 128 returned packets of magnitude 120
+      // reach a ring together, for a signed peak of 30,720.
+      this.sums=new Int16Array(distances.length);
+      this.weights=null;
+    }
+
+    route(index) {
+      if (this.routes.has(index)) return this.routes.get(index);
+      const reflectedRoute=this.reflection?.route(index);
+      const delays=reflectedRoute ? reflectedRoute.out :
+        Uint32Array.from(this.distances[index].radial,d=>Math.round(d*1000/600));
+      const returns=reflectedRoute?.back;
+      let farthest=0;
+      // Each returned path includes the outbound path plus the distance
+      // traveled after the bounce. Its last arrival determines the lifetime.
+      for (const delay of returns ?? delays) farthest=Math.max(farthest,delay);
+      const route={delays,returns,lifetime:farthest+PACKET_MS};
+      this.routes.set(index,route);
+      return route;
+    }
+
+    launch(index,now,colors) {
+      if (this.waves.length===MAX_PACKETS) this.waves.shift();
+      this.waves.push({born:now>>>0,route:this.route(index),colors});
+    }
+
+    render(now,pixels,colors = DEFAULT_COLORS,random = false) {
+      this.sums.fill(0);
+      // Each ring uses two groups of four integers: total amplitude, then
+      // amplitude-weighted R/G/B. Clearing is only needed in random mode.
+      let weights=null;
+      if (random) {
+        if (!this.weights) this.weights=new Uint32Array(this.sums.length*8);
+        weights=this.weights;
+        weights.fill(0);
+      }
+      let active=0;
+      for (const wave of this.waves) {
+        const age=(now-wave.born)>>>0;
+        if (age>=wave.route.lifetime) continue;
+        this.waves[active++]=wave;
+        const {delays,returns}=wave.route;
+        for (let i=0;i<delays.length;i++) {
+          const localTime=age-delays[i];
+          let v=localTime>=0 && localTime<PACKET_MS ? packet[localTime] : 0;
+          if (returns) {
+            const echoTime=age-returns[i];
+            if (echoTime>=0 && echoTime<PACKET_MS) v+=packet[echoTime];
+          }
+          this.sums[i]+=v;
+          if (weights && v) {
+            const off=i*8+(v<0 ? 4 : 0), w=Math.abs(v);
+            const tint=v>0 ? wave.colors.crest : wave.colors.trough;
+            weights[off]+=w;
+            weights[off+1]+=w*tint[0]; weights[off+2]+=w*tint[1]; weights[off+3]+=w*tint[2];
+          }
+        }
+      }
+      this.waves.length=active;
+      for (let i=0;i<this.sums.length;i++) {
+        const sum=this.sums[i];
+        if (!sum) continue; // Scene supplies a cleared frame.
+        const level=Math.min(255,Math.abs(sum));
+        let r,g,b;
+        if (weights) {
+          const off=i*8+(sum<0 ? 4 : 0);
+          const denominator=255*weights[off];
+          r=Math.round(level*weights[off+1]/denominator);
+          g=Math.round(level*weights[off+2]/denominator);
+          b=Math.round(level*weights[off+3]/denominator);
+        } else {
+          const tint=sum>0 ? colors.crest : colors.trough;
+          r=Math.floor((tint[0]*level+127)/255);
+          g=Math.floor((tint[1]*level+127)/255);
+          b=Math.floor((tint[2]*level+127)/255);
+        }
+        for (let p=0, off=i*48; p<16; p++,off+=3) {
+          pixels[off]=r; pixels[off+1]=g; pixels[off+2]=b;
+        }
+      }
+      return active;
+    }
+  }
+  window.SpringInterference=Interference;
+})();
+
+(() => {
+  "use strict";
+
+  const PALETTE = [[40,205,255], [255,93,24], [185,65,255],
+                   [75,255,130], [255,70,148], [255,202,35]];
+  const PITCH_MM = 60;
+  const PIXELS = 16;
+  const scale = (value, level) => Math.floor((value * level + 127) / 255);
+  const elapsed = (now, start) => (now - start) >>> 0;
+
+  function noise(seed) {
+    seed ^= seed >>> 16;
+    seed = Math.imul(seed, 0x7feb352d);
+    seed ^= seed >>> 15;
+    return seed >>> 24;
+  }
+
+  function streak(led, head) {
+    const behind = (head - led) & 15;
+    return behind === 0 ? 255 : behind === 1 ? 120 : behind === 2 ? 52 : behind === 3 ? 20 : 0;
+  }
+
+  function addColor(colors, index, color, level) {
+    for (let ch = 0; ch < 3; ++ch) {
+      const offset = index * 3 + ch;
+      colors[offset] = Math.min(255, colors[offset] + scale(color[ch], level));
+    }
+  }
+
+  function envelope(age, arrival, width, peak) {
+    const time = age - arrival;
+    if (time < 0 || time >= width) return 0;
+    if (arrival === 0) return Math.floor(peak * (width - time) / width);
+    const attack = Math.min(30, Math.floor(width / 2));
+    if (time < attack) return Math.floor(peak * time / attack);
+    return Math.floor(peak * (width - time) / (width - attack));
+  }
+
+  function customWave(definition) {
+    const {shape, color, speed, width, reach, hold} = definition;
+    if (!/^#[0-9a-f]{6}$/i.test(color) || !["radial", "square"].includes(shape) ||
+        ![speed, width, reach, hold].every(Number.isFinite) ||
+        speed <= 0 || width < 1 || reach < 0 || hold < 0 || hold > 100) {
+      throw new RangeError("Invalid custom wave shape, color, speed, width, reach, or hold");
+    }
+    const value = parseInt(color.slice(1), 16);
+    return {square: shape === "square", color: [value >>> 16, (value >>> 8) & 255, value & 255],
+            speed, width: Math.round(width), reach, hold: Math.round(hold * 255 / 100)};
+  }
+
+  function applyBudget(pixels, budgetMa, idlePerPixel, channelUa) {
+    const idle = pixels.length / 3 * idlePerPixel;
+    let demand = 0;
+    for (let i = 0; i < pixels.length; i += 3) {
+      demand += pixels[i] * channelUa[0] + pixels[i + 1] * channelUa[1] + pixels[i + 2] * channelUa[2];
+    }
+    const dynamic = Math.ceil(demand / 255);
+    const requested = idle + dynamic;
+    const budget = Math.max(0, Math.floor(budgetMa)) * 1000;
+    if (requested <= budget || demand === 0) {
+      return {pixels, requestedMa: requested / 1000, sentMa: requested / 1000, gain: requested <= budget ? 1 : 0};
+    }
+    const available = Math.max(0, budget - idle);
+    const scaled = new Uint8Array(256);
+    for (let code = 0; code < scaled.length; ++code) scaled[code] = Math.floor(code * available / dynamic);
+    let sent = 0;
+    for (let i = 0; i < pixels.length; i += 3) {
+      for (let ch = 0; ch < 3; ++ch) {
+        pixels[i + ch] = scaled[pixels[i + ch]];
+        sent += pixels[i + ch] * channelUa[ch];
+      }
+    }
+    return {pixels, requestedMa: requested / 1000, sentMa: (idle + Math.ceil(sent / 255)) / 1000,
+            gain: available / dynamic};
+  }
+
+  class Scene {
+    // Calibration units match Config.h: idle per pixel, then the extra R/G/B
+    // channel current at code 255, all in microamps.
+    constructor(rings, calibration = {}) {
+      this.rings = rings.map(({x, y, row, col}, index) => {
+        if (![x, y].every(Number.isFinite)) throw new RangeError("Ring positions must be finite millimeters");
+        return {x, y, row: row ?? 0, col: col ?? index};
+      });
+      this.idleUa = calibration.idleMicroAmpsPerPixel ?? 1000;
+      this.channelUa = Array.from(calibration.channelMicroAmps ?? [20000,20000,20000]);
+      if (this.channelUa.length !== 3 || ![this.idleUa, ...this.channelUa].every(
+          value => Number.isInteger(value) && value >= 0 && value <= 65535)) {
+        throw new RangeError("Calibration values must be unsigned 16-bit microamps");
+      }
+      this.touches = rings.map(() => ({
+        pressedAt: 0, releasedAt: 0, color: PALETTE[0], held: false, wave: false, ever: false,
+        stampRelease: false, fading: false
+      }));
+      this.colorIndex = 0;
+      this.latestIndex = -1;
+      this.heldCount = 0;
+      this.mode = 0;
+      this.ricochet = null;
+      this.drain = null;
+      this.reflection = null;
+      this.interference = null;
+      this.reflectedInterference = null;
+      this.interferenceColors = undefined;
+      this.interferencePalette = null;
+      this.ricochetSeed = calibration.ricochetSeed;
+      // Geometry is fixed for the life of a Scene. Coordinates and distances are mm.
+      // Cache both metrics once so simultaneous plucks only evaluate the envelopes.
+      this.distances = this.rings.map(source => {
+        const radial = new Float64Array(rings.length), square = new Float64Array(rings.length);
+        this.rings.forEach((target, i) => {
+          const dx = Math.abs(source.x - target.x), dy = Math.abs(source.y - target.y);
+          radial[i] = Math.hypot(dx, dy);
+          square[i] = Math.max(dx, dy);
+        });
+        return {radial, square};
+      });
+    }
+
+    setMode(mode) {
+      if (!Number.isInteger(mode) || mode < 0 || mode > 11 || this.mode === mode) return;
+      if (this.interferencePalette) this.interferencePalette.group = null;
+      if (this.ricochet && (this.mode === 7 || mode === 7)) this.ricochet.balls.length = 0;
+      if (this.drain && (this.mode === 8 || mode === 8)) this.drain.orbits.length = 0;
+      if (this.reflection && (this.mode === 9 || mode === 9)) this.reflection.waves.length = 0;
+      if (this.interference && (this.mode === 10 || mode === 10)) this.interference.waves.length = 0;
+      if (this.reflectedInterference && (this.mode === 11 || mode === 11)) this.reflectedInterference.waves.length = 0;
+      if (mode === 10 && !this.interference) this.interference = new window.SpringInterference(this.distances);
+      if ((mode === 9 || mode === 11) && !this.reflection) this.reflection = new window.SpringReflection(this.rings,this.distances);
+      if (mode === 11 && !this.reflectedInterference) {
+        this.reflectedInterference = new window.SpringInterference(this.distances,this.reflection);
+      }
+      if (mode === 8 && !this.drain) this.drain = new window.SpringDrain(this.rings);
+      if (mode === 7 && !this.ricochet) {
+        let seed = this.ricochetSeed;
+        if (seed === undefined) {
+          seed = globalThis.crypto?.getRandomValues(new Uint32Array(1))[0] ??
+                 Math.floor(Math.random() * 0x100000000);
+        }
+        this.ricochet = new window.SpringRicochet(this.rings, PALETTE, seed);
+      }
+      this.mode = mode;
+    }
+
+    setRicochetSeed(seed) {
+      this.ricochetSeed = seed >>> 0;
+      this.ricochet?.setSeed(this.ricochetSeed);
+    }
+
+    setInterferenceColors(crest, trough) {
+      this.interferenceColors = window.SpringInterference.colors(crest, trough);
+      if (this.interferencePalette) {
+        const palette=this.interferencePalette;
+        palette.manual=palette.current=this.interferenceColors;
+        palette.random=false;
+        palette.group=null;
+      }
+    }
+
+    paletteState() {
+      if (!this.interferencePalette) this.interferencePalette=window.SpringInterference.newPalette(this.interferenceColors);
+      return this.interferencePalette;
+    }
+
+    getInterferenceColors() {
+      const {crest,trough}=this.paletteState().current;
+      return {crest:crest.slice(),trough:trough.slice()};
+    }
+
+    getInterferenceRandom() { return this.interferencePalette?.random ?? false; }
+
+    setInterferenceRandom(random) {
+      if (typeof random !== 'boolean') throw new TypeError('Random interference policy must be true or false');
+      const palette=this.paletteState();
+      if (random===palette.random) return;
+      palette.random=random;
+      palette.current=palette.manual;
+      palette.group=null;
+      // All already-visible waves keep their current fixed colors when arming.
+      if (random) for (const field of [this.interference,this.reflectedInterference]) {
+        if (field) for (const wave of field.waves) wave.colors=palette.manual;
+      }
+    }
+
+    setInterferencePaletteSeed(seed) { this.paletteState().setSeed(seed); }
+
+    beginInterferenceGroup() { this.paletteState().group=null; }
+
+    press(index, now) {
+      const touch = this.touches[index];
+      if (!touch) return;
+      if (this.mode >= 7 && touch.held) return;
+      if (this.mode === 7) this.ricochet.launch(this.rings[index], now);
+      touch.color = PALETTE[this.colorIndex % PALETTE.length];
+      if (this.mode === 8) this.drain.launch(this.rings[index], touch.color, now);
+      if (this.mode === 9) this.reflection.launch(index, touch.color, now);
+      if (this.mode === 10 || this.mode === 11) {
+        const field=this.mode===10 ? this.interference : this.reflectedInterference;
+        const colors=this.paletteState().edge(index,now,this.heldCount);
+        field.launch(index,now,colors);
+      }
+      this.colorIndex = (this.colorIndex + 1) >>> 0;
+      touch.pressedAt = now >>> 0;
+      if (!touch.held) ++this.heldCount;
+      touch.ever = touch.held = touch.wave = true;
+      this.latestIndex = index;
+      touch.fading = touch.stampRelease = false;
+    }
+
+    release(index) {
+      const touch = this.touches[index];
+      if (touch && touch.held) { --this.heldCount; touch.held = false; touch.stampRelease = true; }
+    }
+
+    spread(index, age, touch, custom, colors) {
+      const square = custom ? custom.square : this.mode === 6;
+      const distances = this.distances[index][square ? "square" : "radial"];
+      const reach = custom ? custom.reach : (square ? 2 : 2.5) * PITCH_MM;
+      const width = custom ? custom.width : 200;
+      const speed = custom ? custom.speed : PITCH_MM * 10;
+      const color = custom ? custom.color : touch.color;
+      if (touch.wave) for (let i = 0; i < distances.length; ++i) {
+        const distance = distances[i];
+        if (distance > reach) continue;
+        const arrival = Math.round(distance * 1000 / speed);
+        const peak = custom ? 255 - Math.floor(120 * distance / (reach || 1)) : 255 - Math.floor(arrival / 2);
+        const level = envelope(age, arrival, width, peak);
+        if (level > 0) addColor(colors, i, color, level);
+      }
+      if (touch.held) addColor(colors, index, color, custom ? custom.hold : 26);
+    }
+
+    local(index, touch, age, releasedAge, now, pixels) {
+      if (!touch.held && !touch.fading) return;
+      const level = touch.held ? 255 : Math.floor(255 * (450 - releasedAge) / 450);
+      const color = touch.color.map(channel => scale(channel, level));
+      const head = Math.floor(age / 47) & 15;
+      const slot = (Math.floor(age / 80) + index * 59) >>> 0;
+      for (let p = 0; p < PIXELS; ++p) {
+        const offset = (index * PIXELS + p) * 3;
+        if (this.mode === 5) {
+          const ring = this.rings[index], fraction = now % 80;
+          const fireSlot = (Math.floor(now / 80) + ring.row * 37 + ring.col * 23 + p * 193) >>> 0;
+          const heat = 42 + Math.floor((noise(fireSlot) * (80 - fraction) + noise(fireSlot + 1) * fraction) / 100);
+          pixels[offset] = scale(heat, level);
+          pixels[offset + 1] = scale(Math.floor(heat * heat / 330), level);
+          continue;
+        }
+        let strength = 255;
+        if (this.mode === 1 || this.mode === 4) {
+          strength = streak(p, head);
+          if (this.mode === 4) strength += streak(p, head + 5) + streak(p, head + 11);
+        } else if (this.mode === 3 && (noise(slot) & 15) !== p && noise(slot + 123 * p) >= 24) {
+          continue;
+        }
+        for (let ch = 0; ch < 3; ++ch) pixels[offset + ch] = scale(color[ch], strength);
+      }
+    }
+
+    formula(index, touch, age, now, paint, pixels) {
+      const latest = this.latestIndex;
+      const ring = this.rings[index];
+      const context = {i: index, p: 0, x: ring.x, y: ring.y, t: now / 1000,
+        age: touch.ever ? age / 1000 : -1, held: touch.held,
+        d: latest < 0 ? 0 : this.distances[latest].radial[index],
+        dt: latest < 0 ? -1 : elapsed(now, this.touches[latest].pressedAt) / 1000};
+      for (let p = 0; p < PIXELS; ++p) {
+        context.p = p;
+        const rgb = paint(context);
+        for (let ch = 0; ch < 3; ++ch) {
+          const value = Number(rgb[ch]);
+          pixels[(index * PIXELS + p) * 3 + ch] = Number.isNaN(value) ? 0 :
+            Math.max(0, Math.min(255, Math.round(value)));
+        }
+      }
+    }
+
+    frame(time, budgetMa, customDefinition = null) {
+      const now = time >>> 0;
+      if (!Number.isFinite(budgetMa)) throw new RangeError("A finite LED current budget in mA is required");
+      const formula = customDefinition && customDefinition.kind === "formula" ? customDefinition.paint : null;
+      if (customDefinition && customDefinition.kind === "formula" && typeof formula !== "function") {
+        throw new TypeError("Formula definition must supply a paint function");
+      }
+      const custom = customDefinition && !formula ? customWave(customDefinition) : null;
+      const ricochet = !customDefinition && this.mode === 7;
+      const drain = !customDefinition && this.mode === 8;
+      const reflection = !customDefinition && this.mode === 9;
+      const interference = !customDefinition && (this.mode === 10 ? this.interference :
+                                                  this.mode === 11 ? this.reflectedInterference : null);
+      const spatial = !formula && (custom !== null || this.mode === 0 || this.mode === 6);
+      const lifetime = custom ? Math.round(custom.reach * 1000 / custom.speed) + custom.width :
+                               (this.mode === 0 ? 450 : 425);
+      const colors = spatial ? new Uint8Array(this.rings.length * 3) : null;
+      const pixels = new Uint8Array(this.rings.length * PIXELS * 3);
+      this.touches.forEach((touch, i) => {
+        const age = elapsed(now, touch.pressedAt);
+        if (age >= lifetime) touch.wave = false;
+        if (touch.stampRelease) {
+          touch.releasedAt = now;
+          touch.stampRelease = false;
+          touch.fading = true;
+        }
+        const releasedAge = elapsed(now, touch.releasedAt);
+        if (releasedAge >= 450) touch.fading = false;
+        if (formula) this.formula(i, touch, age, now, formula, pixels);
+        else if (spatial) this.spread(i, age, touch, custom, colors);
+        else if (this.mode < 7) this.local(i, touch, age, releasedAge, now, pixels);
+      });
+      if (spatial) for (let i = 0; i < this.rings.length; ++i) {
+        const color = colors.subarray(i * 3, i * 3 + 3);
+        for (let p = 0; p < PIXELS; ++p) pixels.set(color, (i * PIXELS + p) * 3);
+      }
+      const activeBalls = ricochet ? this.ricochet.render(now, pixels) : undefined;
+      const activeOrbits = drain ? this.drain.render(now, pixels) : undefined;
+      let activeWaves;
+      if (reflection) activeWaves = this.reflection.render(now, pixels);
+      if (interference) activeWaves = interference.render(now,pixels,this.interferenceColors,this.getInterferenceRandom());
+      const result = applyBudget(pixels, budgetMa, this.idleUa, this.channelUa);
+      if (ricochet) result.activeBalls = activeBalls;
+      if (drain) result.activeOrbits = activeOrbits;
+      if (reflection || interference) result.activeWaves = activeWaves;
+      return result;
+    }
+  }
+  window.SpringEngine = {Scene};
+})();
+
+(() => {
+  'use strict';
+  const radiusMM = 19;
+  const emitterRadiusMM = 17;
+  const pixelsPerRing = 16;
+  const positions = Array.from({length: pixelsPerRing}, (_, i) => {
+    const theta = i * (2 * Math.PI / pixelsPerRing) - Math.PI / 2;
+    return [Math.cos(theta), Math.sin(theta)];
+  });
+  const clamp = (x, low, high) => Math.max(low, Math.min(high, x));
+  const dot = (ctx, x, y, radius, color) => {
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, 2 * Math.PI);
+    ctx.fillStyle = color;
+    ctx.fill();
+  };
+  const rim = (ctx, x, y, radius, color, width) => {
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, 2 * Math.PI);
+    ctx.lineWidth = width;
+    ctx.strokeStyle = color;
+    ctx.stroke();
+  };
+
+  class SpringBoard {
+    constructor(canvas, handlers = {}) {
+      this.canvas = canvas;
+      this.ctx = canvas.getContext('2d');
+      this.base = document.createElement('canvas');
+      this.handlers = handlers;
+      this.rings = [];
+      this.selected = -1;
+      this.hover = -1;
+      this.tool = 'play';
+      this.center = {x: 0, y: 0};
+      this.zoomFactor = 1;
+      this.scale = 1;
+      this.width = this.height = this.dpr = 0;
+      this.staticDirty = true;
+      this.owners = new Map();
+      this.pointers = new Map();
+      this.space = false;
+      this.pannedWithSpace = false;
+      this.pixels = new Uint8Array();
+      this.held = new Set();
+      this.listeners = new AbortController();
+      const signal = this.listeners.signal;
+      const on = (node, event, callback) => node.addEventListener(event, callback, {signal});
+      canvas.tabIndex = 0;
+      if (!canvas.hasAttribute('aria-label')) {
+        canvas.setAttribute('aria-label', 'Interactive spring board. Use arrow keys to select and Enter or Space to pluck.');
+      }
+      canvas.style.touchAction = 'none';
+      canvas.style.userSelect = canvas.style.webkitUserSelect = 'none';
+      on(canvas, 'pointerdown', e => this.down(e));
+      on(canvas, 'pointermove', e => this.move(e));
+      on(canvas, 'pointerup', e => this.up(e));
+      on(canvas, 'pointerleave', e => this.leave(e));
+      on(canvas, 'pointercancel', e => this.forget(e.pointerId));
+      on(canvas, 'lostpointercapture', e => {
+        if (this.pointers.get(e.pointerId)?.kind !== 'hover') this.forget(e.pointerId);
+      });
+      on(canvas, 'keydown', e => this.keydown(e));
+      on(window, 'keydown', e => {
+        // A mouse user can begin a Space-drag before the first canvas click.
+        // Leave native keyboard actions with any focused sidebar control.
+        if (e.key === ' ' && document.activeElement === document.body && canvas.matches(':hover')) {
+          canvas.focus({preventScroll: true});
+          this.keydown(e);
+        }
+      });
+      on(window, 'keyup', e => this.keyup(e));
+      on(canvas, 'blur', () => this.resetInputs());
+      on(window, 'blur', () => this.resetInputs());
+      on(document, 'visibilitychange', () => { if (document.hidden) this.resetInputs(); });
+      on(canvas, 'focus', () => this.repaint());
+      this.observer = new ResizeObserver(() => this.resize());
+      this.observer.observe(canvas);
+      on(window, 'resize', () => this.resize());
+      this.resize();
+    }
+
+    setLayout(rings, fit = true) {
+      const changedCount = rings.length !== this.rings.length;
+      if (fit || changedCount) this.resetInputs();
+      this.rings = rings;
+      if (this.selected >= rings.length) this.selected = -1;
+      this.staticDirty = true;
+      if (fit) this.fit();
+      else this.repaint();
+    }
+
+    setTool(tool) {
+      if (!['play', 'move', 'add', 'pair'].includes(tool) || this.tool === tool) return;
+      this.resetInputs();
+      this.tool = tool;
+      this.setCursor();
+      this.repaint();
+    }
+
+    setSelected(index) {
+      this.selected = Number.isInteger(index) && index >= 0 && index < this.rings.length ? index : -1;
+      this.repaint();
+    }
+
+    bounds() {
+      if (!this.rings.length) return {x: 0, y: 0, w: 250, h: 250};
+      let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
+      for (const {x, y} of this.rings) {
+        left = Math.min(left, x); right = Math.max(right, x);
+        top = Math.min(top, y); bottom = Math.max(bottom, y);
+      }
+      return {x: (left + right) / 2, y: (top + bottom) / 2,
+              w: right - left + radiusMM * 2, h: bottom - top + radiusMM * 2};
+    }
+
+    fitScale(bounds = this.bounds()) {
+      const pad = clamp(Math.min(this.width, this.height) * 0.055, 12, 36);
+      return Math.max(0.001, Math.min((this.width - pad * 2) / bounds.w,
+                                      (this.height - pad * 2) / bounds.h, 4.5));
+    }
+
+    fit() {
+      const bounds = this.bounds();
+      this.center = {x: bounds.x, y: bounds.y};
+      this.zoomFactor = 1;
+      this.scale = this.fitScale(bounds);
+      this.staticDirty = true;
+      this.repaint();
+    }
+
+    zoom(factor) {
+      if (!(factor > 0 && Number.isFinite(factor))) return;
+      const next = clamp(this.zoomFactor * factor, 0.35, 8);
+      this.scale *= next / this.zoomFactor;
+      this.zoomFactor = next;
+      this.staticDirty = true;
+      this.repaint();
+    }
+
+    resize() {
+      const b = this.canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      if (!b.width || !b.height || (this.width === b.width && this.height === b.height && this.dpr === dpr)) return;
+      this.width = b.width; this.height = b.height; this.dpr = dpr;
+      this.canvas.width = this.base.width = Math.max(1, Math.round(b.width * dpr));
+      this.canvas.height = this.base.height = Math.max(1, Math.round(b.height * dpr));
+      this.scale = this.fitScale() * this.zoomFactor;
+      this.staticDirty = true;
+      this.repaint();
+    }
+
+    world(e) {
+      const b = this.canvas.getBoundingClientRect();
+      return {x: this.center.x + (e.clientX - b.left - b.width / 2) / this.scale,
+              y: this.center.y + (e.clientY - b.top - b.height / 2) / this.scale};
+    }
+
+    screen(point) {
+      return {x: (point.x - this.center.x) * this.scale + this.width / 2,
+              y: (point.y - this.center.y) * this.scale + this.height / 2};
+    }
+
+    hit(point) {
+      const s = this.screen(point);
+      if (s.x < 0 || s.y < 0 || s.x > this.width || s.y > this.height) return -1;
+      let closest = -1, best = radiusMM ** 2;
+      for (let i = 0; i < this.rings.length; i++) {
+        const r = this.rings[i];
+        const d = (r.x - point.x) ** 2 + (r.y - point.y) ** 2;
+        if (d <= best) { closest = i; best = d; }
+      }
+      return closest;
+    }
+
+    notifyHover(index) {
+      if (index === this.hover) return;
+      this.hover = index;
+      this.handlers.onHover?.(index);
+      this.setCursor();
+    }
+
+    choose(index) {
+      if (index < 0) return;
+      this.setSelected(index);
+      this.handlers.onSelect?.(index);
+    }
+
+    contact(owner, index) {
+      const old = this.owners.get(owner) ?? -1;
+      if (old === index) return;
+      this.owners.delete(owner);
+      if (old >= 0 && !Array.from(this.owners.values()).includes(old)) this.handlers.onRelease?.(old);
+      if (index >= 0) {
+        const first = !Array.from(this.owners.values()).includes(index);
+        this.owners.set(owner, index);
+        if (first) this.handlers.onPress?.(index);
+      }
+    }
+
+    forget(id) {
+      const p = this.pointers.get(id);
+      if (!p) return;
+      this.pointers.delete(id);
+      clearTimeout(p.timer);
+      this.contact(id, -1);
+      if (this.canvas.hasPointerCapture(id)) this.canvas.releasePointerCapture(id);
+      const remaining = [...this.pointers.values()].pop();
+      this.notifyHover(remaining ? this.hit(remaining.point) : -1);
+      this.setCursor();
+    }
+
+    resetInputs() {
+      for (const id of [...this.pointers.keys()]) this.forget(id);
+      for (const id of [...this.owners.keys()]) this.contact(id, -1);
+      this.space = this.pannedWithSpace = false;
+      this.notifyHover(-1);
+      this.setCursor();
+      this.repaint();
+    }
+
+    setCursor() {
+      const active = [...this.pointers.values()];
+      if (active.some(p => p.kind === 'pan' || p.kind === 'move')) this.canvas.style.cursor = 'grabbing';
+      else if (this.space) this.canvas.style.cursor = 'grab';
+      else if (this.tool === 'move') this.canvas.style.cursor = this.hover >= 0 ? 'grab' : 'default';
+      else this.canvas.style.cursor = this.tool === 'add' || this.tool === 'pair' ? 'crosshair' : 'default';
+    }
+
+    down(e) {
+      if (e.button !== 0 && e.button !== 1) return;
+      e.preventDefault();
+      this.canvas.focus({preventScroll: true});
+      const point = this.world(e), index = this.hit(point);
+      const p = this.pointers.get(e.pointerId) || {};
+      clearTimeout(p.timer);
+      Object.assign(p, {index, point, cx: e.clientX, cy: e.clientY});
+      this.pointers.set(e.pointerId, p);
+      this.canvas.setPointerCapture(e.pointerId);
+      if (e.button === 1 || this.space) {
+        p.kind = 'pan';
+        this.pannedWithSpace = this.space;
+        this.contact(e.pointerId, -1);
+      } else if (this.tool === 'add') {
+        p.kind = 'add';
+        this.handlers.onAdd?.(point.x, point.y);
+      } else if (this.tool === 'pair') {
+        p.kind = 'pair';
+        if (index >= 0) { this.choose(index); this.handlers.onPick?.(index); }
+      } else if (this.tool === 'move') {
+        p.kind = 'move';
+        if (index >= 0) {
+          p.dx = this.rings[index].x - point.x;
+          p.dy = this.rings[index].y - point.y;
+          this.choose(index);
+        }
+      } else {
+        p.kind = 'play';
+        this.choose(index);
+        this.contact(e.pointerId, index);
+      }
+      this.notifyHover(index);
+      this.setCursor();
+    }
+
+    cross(id, p, index) {
+      if (p.index === index) return;
+      p.index = index;
+      clearTimeout(p.timer);
+      this.contact(id, index);
+      // Flying over a coil plucks it once. Pressing down adopts that contact
+      // until this pointer leaves, even if a second pointer touches it too.
+      if (p.kind === 'hover' && index >= 0) {
+        p.timer = setTimeout(() => this.contact(id, -1), 90);
+      }
+    }
+
+    move(e) {
+      const point = this.world(e);
+      let p = this.pointers.get(e.pointerId);
+      if (!p && (e.pointerType === 'touch' || e.buttons)) return;
+      if (!p) {
+        p = {kind: 'hover', index: -1, point};
+        this.pointers.set(e.pointerId, p);
+      }
+      if (p.kind === 'pan') {
+        this.center.x -= (e.clientX - p.cx) / this.scale;
+        this.center.y -= (e.clientY - p.cy) / this.scale;
+        p.cx = e.clientX; p.cy = e.clientY;
+        this.staticDirty = true;
+        this.repaint();
+        return;
+      }
+      const index = this.hit(point);
+      if (p.kind === 'move' && p.index >= 0 && this.rings[p.index]) {
+        this.handlers.onMove?.(p.index, point.x + p.dx, point.y + p.dy);
+      } else if (this.tool === 'play' && (p.kind === 'play' || p.kind === 'hover') && !this.space) {
+        const dx = point.x - p.point.x, dy = point.y - p.point.y;
+        // Sparse mouse events still cross all the rings along a fast stroke.
+        const steps = clamp(Math.ceil(Math.hypot(dx, dy) / (radiusMM / 2)), 1, 256);
+        for (let i = 1; i <= steps; i++) {
+          this.cross(e.pointerId, p, this.hit({x: p.point.x + dx * i / steps, y: p.point.y + dy * i / steps}));
+        }
+      }
+      p.point = point;
+      this.notifyHover(index);
+    }
+
+    up(e) {
+      const p = this.pointers.get(e.pointerId);
+      if (!p) return;
+      if (e.pointerType === 'touch') { this.forget(e.pointerId); return; }
+      this.contact(e.pointerId, -1);
+      p.kind = 'hover';
+      p.point = this.world(e);
+      p.index = this.hit(p.point);
+      if (this.canvas.hasPointerCapture(e.pointerId)) this.canvas.releasePointerCapture(e.pointerId);
+      this.notifyHover(p.index);
+      this.setCursor();
+    }
+
+    leave(e) {
+      const p = this.pointers.get(e.pointerId);
+      if (p && (p.kind === 'pan' || p.kind === 'move') && this.canvas.hasPointerCapture(e.pointerId)) return;
+      this.forget(e.pointerId);
+    }
+
+    neighbor(dx, dy) {
+      if (this.selected < 0) return this.rings.length ? 0 : -1;
+      const origin = this.rings[this.selected];
+      if (!origin) return -1;
+      let best = Infinity, index = this.selected;
+      for (let i = 0; i < this.rings.length; i++) {
+        const x = this.rings[i].x - origin.x, y = this.rings[i].y - origin.y;
+        const along = x * dx + y * dy, across = Math.abs(x * dy - y * dx);
+        if (along <= 0 || across > along * 1.5) continue;
+        const score = Math.hypot(x, y) + 2 * across;
+        if (score < best) { best = score; index = i; }
+      }
+      return index;
+    }
+
+    reveal(index) {
+      if (index < 0) return;
+      const {x, y} = this.screen(this.rings[index]);
+      const margin = Math.min(radiusMM * this.scale + 5, this.width / 2, this.height / 2);
+      const targetX = clamp(x, margin, this.width - margin);
+      const targetY = clamp(y, margin, this.height - margin);
+      if (targetX === x && targetY === y) return;
+      this.center.x += (x - targetX) / this.scale;
+      this.center.y += (y - targetY) / this.scale;
+      this.staticDirty = true;
+    }
+
+    keydown(e) {
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
+      const arrows = {ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1]};
+      if (arrows[e.key]) {
+        e.preventDefault();
+        const next = this.neighbor(...arrows[e.key]);
+        this.reveal(next);
+        this.choose(next);
+        return;
+      }
+      if (e.key !== ' ' && e.key !== 'Enter') return;
+      e.preventDefault();
+      if (e.repeat) return;
+      if (this.tool === 'pair') {
+        if (this.selected < 0 && this.rings.length) this.choose(0);
+        if (this.selected >= 0) this.handlers.onPick?.(this.selected);
+        return;
+      }
+      if (e.key === ' ') {
+        // Space doubles as a pan modifier; commit its pluck on release only
+        // if no drag started. Enter provides immediate press-and-hold.
+        this.space = true;
+        this.pannedWithSpace = false;
+        this.setCursor();
+      } else if (this.tool === 'play' && this.rings.length) {
+        if (this.selected < 0) this.choose(0);
+        this.contact('Enter', this.selected);
+      }
+    }
+
+    keyup(e) {
+      if (e.key === 'Enter') this.contact('Enter', -1);
+      if (e.key !== ' ' || !this.space) return;
+      this.space = false;
+      if (!this.pannedWithSpace && this.tool === 'play' && this.rings.length) {
+        if (this.selected < 0) this.choose(0);
+        this.contact('Space', this.selected);
+        this.contact('Space', -1);
+      }
+      this.setCursor();
+    }
+
+    repaint() { if (this.width && this.height) this.draw(this.pixels, this.held); }
+
+    paintBase() {
+      const ctx = this.base.getContext('2d'), w = this.width, h = this.height;
+      ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+      const origin = this.screen({x: 0, y: 0});
+      let grid = 25 * this.scale;
+      while (grid < 15) grid *= 2;
+      while (grid > 75) grid /= 2;
+      const start = (n, step) => ((n % step) + step) % step;
+      ctx.strokeStyle = 'rgba(158,185,177,.065)';
+      ctx.lineWidth = 0.75; ctx.beginPath();
+      for (let x = start(origin.x, grid); x <= w; x += grid) { ctx.moveTo(x, 0); ctx.lineTo(x, h); }
+      for (let y = start(origin.y, grid); y <= h; y += grid) { ctx.moveTo(0, y); ctx.lineTo(w, y); }
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(155,190,180,.27)'; ctx.lineWidth = 0.8; ctx.beginPath();
+      for (let x = start(origin.x, grid * 4); x <= w; x += grid * 4) {
+        for (let y = start(origin.y, grid * 4); y <= h; y += grid * 4) {
+          ctx.moveTo(x - 3, y); ctx.lineTo(x + 3, y);
+          ctx.moveTo(x, y - 3); ctx.lineTo(x, y + 3);
+        }
+      }
+      ctx.stroke();
+      const radius = this.scale * radiusMM;
+      this.visible = [];
+      for (let i = 0; i < this.rings.length; i++) {
+        const {x, y} = this.screen(this.rings[i]);
+        if (x < -radius * 1.5 || y < -radius * 1.5 || x > w + radius * 1.5 || y > h + radius * 1.5) continue;
+        this.visible.push({i, x, y});
+        this.paintRing(ctx, x, y, radius);
+      }
+      this.staticDirty = false;
+    }
+
+    paintRing(ctx, x, y, r) {
+      const track = r * emitterRadiusMM / radiusMM, p = r * 0.093;
+      rim(ctx, x, y, r * 0.84, '#0b1112', r * 0.33);
+      rim(ctx, x, y, r, '#45514e', Math.max(0.5, r * 0.034));
+      rim(ctx, x, y, r * 0.68, '#374541', Math.max(0.42, r * 0.029));
+      rim(ctx, x, y, track, '#333e3a', r * 0.12);
+      for (const [dx, dy] of positions) {
+        dot(ctx, x + track * dx, y + track * dy, p * 1.10, '#151d1c');
+        dot(ctx, x + track * dx, y + track * dy, p * 0.87, '#59635e');
+      }
+      const metal = ctx.createLinearGradient(x - r * 0.28, y - r * 0.30, x + r * 0.29, y + r * 0.26);
+      metal.addColorStop(0, '#9aaba6'); metal.addColorStop(0.28, '#64746f');
+      metal.addColorStop(0.60, '#35423e'); metal.addColorStop(1, '#687872');
+      dot(ctx, x, y, r * 0.33, '#09100f');
+      dot(ctx, x, y, r * 0.29, metal);
+      rim(ctx, x, y, r * 0.212, '#25322f', Math.max(0.42, r * 0.03));
+      dot(ctx, x, y, r * 0.145, metal);
+    }
+
+    draw(pixels = this.pixels, heldSet = this.held) {
+      this.pixels = pixels;
+      this.held = heldSet;
+      if (!this.width || !this.height) return;
+      if ((window.devicePixelRatio || 1) !== this.dpr) { this.resize(); return; }
+      if (this.staticDirty) this.paintBase();
+      const ctx = this.ctx, radius = radiusMM * this.scale, track = emitterRadiusMM * this.scale;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      ctx.drawImage(this.base, 0, 0);
+      ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+      for (const {i, x, y} of this.visible) {
+        if (this.tool !== 'play' && this.selected === i) {
+          rim(ctx, x, y, radius * 1.15, '#e6ad70', 1.5);
+        } else if (this.hover === i || (this.selected === i && this.canvas.matches(':focus-visible'))) {
+          rim(ctx, x, y, radius * 1.13, 'rgba(226,175,115,.85)', 1.1);
+        }
+        const start = i * 48;
+        if (pixels && pixels.length >= start + 48) {
+          for (let j = 0; j < pixelsPerRing; j++) {
+            const offset = start + j * 3;
+            const r = pixels[offset], g = pixels[offset + 1], b = pixels[offset + 2];
+            const peak = Math.max(r, g, b);
+            if (!peak) continue;
+            const [dx, dy] = positions[j];
+            const px = x + dx * track, py = y + dy * track;
+            const level = Math.sqrt(peak / 255), color = [r, g, b].map(c => Math.round(255 * c / peak)).join(',');
+            dot(ctx, px, py, radius * 0.20, 'rgba(' + color + ',' + (level * 0.17) + ')');
+            dot(ctx, px, py, radius * 0.135, 'rgba(' + color + ',' + (level * 0.36) + ')');
+            dot(ctx, px, py, radius * 0.089, 'rgba(' + color + ',' + level + ')');
+          }
+        }
+        if (heldSet?.has(i)) {
+          rim(ctx, x, y, radius * 0.35, 'rgba(168,228,207,.8)', Math.max(1, radius * 0.045));
+          dot(ctx, x, y, radius * 0.14, '#c5f3de');
+        }
+      }
+      if (this.canvas.matches(':focus-visible')) {
+        ctx.strokeStyle = '#dca56e'; ctx.lineWidth = 2;
+        ctx.strokeRect(1, 1, this.width - 2, this.height - 2);
+      }
+    }
+
+    destroy() {
+      this.resetInputs();
+      this.listeners.abort();
+      this.observer.disconnect();
+    }
+  }
+  window.SpringBoard = SpringBoard;
+})();
+
+"use strict";
+// Bounded arithmetic expressions for the lab. Project files contain data only.
+const variables = new Set(["i","p","x","y","t","age","held","dt","d"]);
+const functions = {
+  sin:[1,Math.sin], cos:[1,Math.cos], abs:[1,Math.abs], floor:[1,Math.floor],
+  min:[2,Math.min], max:[2,Math.max], clamp:[3,(v,lo,hi)=>Math.max(lo,Math.min(hi,v))],
+  if:[3,(test,yes,no)=>test ? yes : no]
+};
+const operators = {
+  "<":[1,(a,b)=>+(a<b)], ">":[1,(a,b)=>+(a>b)], "<=":[1,(a,b)=>+(a<=b)], ">=":[1,(a,b)=>+(a>=b)],
+  "==":[1,(a,b)=>+(a===b)], "!=":[1,(a,b)=>+(a!==b)], "+":[2,(a,b)=>a+b], "-":[2,(a,b)=>a-b],
+  "*":[3,(a,b)=>a*b], "/":[3,(a,b)=>b===0?0:a/b], "%":[3,(a,b)=>b===0?0:a%b]
+};
+function compileExpression(source) {
+  if(typeof source!=="string" || source.length>384) throw Error("Use at most 384 characters per channel.");
+  const tokens=source.match(/\d+\.?\d*|\.\d+|[A-Za-z_][A-Za-z_0-9]*|<=|>=|==|!=|[^\s]/g)||[];
+  if(tokens.length>100) throw Error("Use at most 100 tokens per channel.");
+  let at=0;
+  function take(token) { if(tokens[at]===token){at++;return true;} return false; }
+  function required(token){if(!take(token))throw Error("Expected '"+token+"'.");}
+  function atom(){
+    if(take("-")){const v=atom();return c=>-v(c);}
+    if(take("+"))return atom();
+    if(take("(")){const v=expression(0);required(")");return v;}
+    const word=tokens[at++];
+    if(!word)throw Error("Expected a number or variable.");
+    if(/^(?:\d+\.?\d*|\.\d+)$/.test(word)){const v=Number(word);return ()=>v;}
+    if(word==="pi")return ()=>Math.PI;
+    if(variables.has(word))return c=>Number(c[word]);
+    if(Object.hasOwn(functions,word)){
+      const [n,fn]=functions[word];required("(");const args=[expression(0)];
+      while(take(","))args.push(expression(0));
+      required(")");if(args.length!==n)throw Error(word+" needs "+n+" arguments.");
+      if(n===1)return c=>fn(args[0](c));
+      if(n===2)return c=>fn(args[0](c),args[1](c));
+      return c=>fn(args[0](c),args[1](c),args[2](c));
+    }
+    throw Error("Unknown term '"+word+"'.");
+  }
+  function expression(minimum){
+    let left=atom();
+    while(Object.hasOwn(operators,tokens[at])){
+      const [precedence,fn]=operators[tokens[at]];if(precedence<minimum)break;
+      at++;const rhs=expression(precedence+1),lhs=left;left=c=>fn(lhs(c),rhs(c));
+    }
+    return left;
+  }
+  const evaluate=expression(0);
+  if(at!==tokens.length)throw Error("Unexpected '"+tokens[at]+"'.");
+  return evaluate;
+}
+const EXAMPLE_EXPR=["if(age >= 0, max(0, 1-age) * (125+125*cos(p*pi/8-age*9)), 0)","if(held, 40, 0)","if(age >= 0, max(0, 1-age) * (125-125*cos(p*pi/8-age*9)), 0)"];
+const newWave=()=>({name:"Echo bloom",kind:"wave",shape:"radial",color:"#fd925a",speed:450,reach:225,width:320,hold:10});
+function runtimePattern(def) {
+  if(def.kind!=="formula")return def;
+  const compiled=def.expr.map((s,i)=>{try{return compileExpression(s);}catch(e){throw Error(["Red","Green","Blue"][i]+": "+e.message);}});
+  return {...def,paint:c=>[compiled[0](c),compiled[1](c),compiled[2](c)]};
+}
+const MAX_RINGS=400, SHAPES=["grid","hex","circle","spiral","custom"];
+function geometry(shape,rows,cols,count,pitch){
+  const rings=[];
+  if(shape==="grid"||shape==="hex"){
+    for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)
+      rings.push({x:(c + (shape==="hex" && r%2 ? 0.5 : 0))*pitch,y:r*pitch*(shape==="hex"?Math.sqrt(3)/2:1),row:r,col:c});
+  }else if(shape==="circle"){
+    const radius=count===1?0:pitch/(2*Math.sin(Math.PI/count));
+    for(let i=0;i<count;i++){const a=2*Math.PI*i/count-Math.PI/2;rings.push({x:radius*Math.cos(a),y:radius*Math.sin(a),row:0,col:i});}
+  }else if(shape==="spiral"){
+    const angle=Math.PI*(3-Math.sqrt(5));
+    for(let i=0;i<count;i++){const r=pitch*.6*Math.sqrt(i);rings.push({x:r*Math.cos(i*angle),y:r*Math.sin(i*angle),row:0,col:i});}
+  }
+  if(rings.length){
+    const left=Math.min(...rings.map(r=>r.x)),right=Math.max(...rings.map(r=>r.x));
+    const top=Math.min(...rings.map(r=>r.y)),bottom=Math.max(...rings.map(r=>r.y));
+    for(const r of rings){r.x-=(left+right)/2;r.y-=(top+bottom)/2;}
+  }
+  return rings;
+}
+function defaultProject(){return {format:"springtable-studio",version:1,name:"Studio table",shape:"grid",rows:10,cols:10,count:100,spacing:60,budget:40,mode:"0",rings:geometry("grid",10,10,100,60),patterns:[]};}
+const palettePresets = [
+  {id:"original", name:"Aqua & violet", crest:"#28d2ff", trough:"#5f41be"},
+  {id:"amber-blue", name:"Amber & blue", crest:"#ffac32", trough:"#287aff"},
+  {id:"rose-lime", name:"Rose & lime", crest:"#ff4d83", trough:"#a8ed40"},
+  {id:"ice-ember", name:"Ice & ember", crest:"#bcf4ff", trough:"#ff5935"}
+];
+function setProjectColors(project, colors){
+  if(!colors || ![colors.crest,colors.trough].every(s=>typeof s==="string" && /^#[0-9a-f]{6}$/i.test(s))){
+    throw Error("Interference colors need a six-digit hex value for both crest and trough.");
+  }
+  const crest=colors.crest.toLowerCase(),trough=colors.trough.toLowerCase();
+  const original=palettePresets[0];
+  if(crest===original.crest && trough===original.trough) delete project.interferenceColors;
+  else project.interferenceColors={crest,trough};
+}
+function bounded(n,lo,hi,whole=false){return Number.isFinite(n)&&n>=lo&&n<=hi&&(!whole||Number.isInteger(n));}
+function minimumBudget(ringCount){return Math.max(.1,Math.ceil(ringCount*16/100)/10);}
+function validatePattern(p){
+  if(!p||typeof p.name!=="string"||!p.name.trim()||p.name.length>45)throw Error("Give the pattern a name of 1–45 characters.");
+  if(p.kind==="formula"){
+    if(!Array.isArray(p.expr)||p.expr.length!==3)throw Error("A formula needs three channels.");
+    runtimePattern(p);return {kind:"formula",name:p.name.trim(),expr:p.expr.slice()};
+  }
+  if(p.kind!=="wave"||!["radial","square"].includes(p.shape)||!/^#[0-9a-f]{6}$/i.test(p.color)||!bounded(p.speed,10,5000)||!bounded(p.reach,1,5000)||!bounded(p.width,10,5000)||!bounded(p.hold,0,100))throw Error("Check the wave shape, color and field ranges.");
+  return {kind:"wave",name:p.name.trim(),shape:p.shape,color:p.color,speed:p.speed,reach:p.reach,width:p.width,hold:p.hold};
+}
+function validateProject(p){
+  if(!p||p.format!=="springtable-studio"||p.version!==1)throw Error("Choose a SpringTable Studio version 1 project.");
+  if(!SHAPES.includes(p.shape)||!bounded(p.rows,1,32,true)||!bounded(p.cols,1,32,true)||!bounded(p.count,1,MAX_RINGS,true)||!bounded(p.spacing,20,300)||!bounded(p.budget,.1,60)||!Array.isArray(p.rings)||p.rings.length<1||p.rings.length>MAX_RINGS)throw Error("The saved layout settings are outside the supported range.");
+  const rings=p.rings.map(r=>{if(!r||!bounded(r.x,-100000,100000)||!bounded(r.y,-100000,100000)||!bounded(r.row,0,100000,true)||!bounded(r.col,0,100000,true))throw Error("Invalid ring position.");return {x:r.x,y:r.y,row:r.row,col:r.col};});
+  if(p.budget<minimumBudget(rings.length))throw Error("The budget must cover the idle current for all installed pixels.");
+  if((p.shape==="grid"||p.shape==="hex")&&p.rows*p.cols!==rings.length)throw Error("Ring count does not match grid dimensions.");
+  if(!Array.isArray(p.patterns)||p.patterns.length>100)throw Error("Invalid pattern collection.");
+  const patterns=p.patterns.map(validatePattern);
+  if(typeof p.mode!=="string"||!(/^(?:[0-9]|1[01])$/.test(p.mode)||(/^u\d+$/.test(p.mode)&&Number(p.mode.slice(1))<patterns.length)))throw Error("Unknown active pattern.");
+  if(typeof p.name!=="string"||p.name.length>80)throw Error("Invalid project name.");
+  const project={format:p.format,version:1,name:p.name,shape:p.shape,rows:p.rows,cols:p.cols,count:p.count,spacing:p.spacing,budget:p.budget,mode:p.mode,rings,patterns};
+  if(Object.hasOwn(p,"interferenceColors"))setProjectColors(project,p.interferenceColors);
+  if(Object.hasOwn(p,"interferencePaletteMode")){
+    if(p.interferencePaletteMode==="random")project.interferencePaletteMode="random";
+    else if(p.interferencePaletteMode!=="fixed")throw Error("Unknown interference palette mode.");
+  }
+  return project;
+}
+
+(() => {
+  "use strict";
+  const $=id=>document.getElementById(id);
+  const icons={folder:"M3 6h6l2 2h10v10H3z",download:"M12 3v11m-4-4 4 4 4-4M4 15v5h16v-5",play:"m8 5 11 7-11 7z",pause:"M8 5v14M16 5v14",layout:"M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z",wave:"M2 12h4l3-8 5 16 3-8h5",sliders:"M3 7h7m4 0h7M3 17h11m4 0h3M10 4v6m5 4v6",pointer:"m5 3 14 11-7 1-3 7z",touch:"M9 15V7a2 2 0 0 1 4 0v6l2-2 5 3-2 7h-7l-6-7 2-2z",move:"M12 2v20M2 12h20M9 5l3-3 3 3M9 19l3 3 3-3M5 9l-3 3 3 3M19 9l3 3-3 3",plus:"M12 5v14M5 12h14",minus:"M4 12h16",undo:"M8 4 3 9l5 5M3 9h11a6 6 0 0 1 0 12"};
+  const drawIcon=name=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+icons[name]+'"/></svg>';
+  document.querySelectorAll("[data-icon]").forEach(el=>el.innerHTML=drawIcon(el.dataset.icon));
+  const modes=["Ripple","Spinner","Solid","Confetti","Three-dot gear","Fire","Surface","Ricochet","Drain","Reflection","Interference","Reflected Interference"];
+  const descriptions=["A colored wave spreads from each spring to its neighbors.","A comet circles the touched ring and fades after release.","Touched rings hold their color, then fade out.","Color sparks scatter around each touched ring.","Three bright teeth rotate around the touched ring.","Amber embers flicker across the touched ring.","A square wave expands around each touch.","Each pluck launches a colored ball. It rebounds off the outer edge, leaves a short trail, and fades. Brush several springs to fill the table.","A colored trail spirals inward from each pluck. It spins faster as it tightens, flashes white at the center, then fades to black.","A ripple spreads to the outer edges. A paler echo races back to the spring you touched."];
+  descriptions.push("Each spring sends a train of ripples. Crests and troughs take the two palette colors. Equal, opposite waves cancel to black.");
+  descriptions.push("Each ripple bounces once at the edge. Returning crests strengthen outgoing crests and cancel equal troughs. Pick two springs to launch both together.");
+  const usesPairedWaves = mode => mode==="10" || mode==="11";
+  const shapeNames={grid:"Grid",hex:"Hex lattice",circle:"Circle",spiral:"Spiral",custom:"Custom"};
+  const key="springtable-studio-project-v1";
+  let project=defaultProject(), restored=false;
+  try{const saved=localStorage.getItem(key);if(saved){project=validateProject(JSON.parse(saved));restored=true;}}catch{}
+  let selected=0,pixel=0,tab="play",tool="move",custom=null,scene,sceneDirty=true;
+  let simNow=0,prevReal=performance.now(),paused=false,demo=false,all=false,lastDemoBeat=-1,demoStart=0;
+  let labIndex=-1,lastPaint=0,frameResult=null,saveTimer=0,noticeTimer=0,dragUndo=false;
+  let pairFirst=null; // null: normal input; -1: waiting for the first of two picks
+  const contacts=new Map(),history=[];
+  function notice(msg){$("message").textContent=msg;clearTimeout(noticeTimer);noticeTimer=setTimeout(()=>$("message").textContent="",6000);}
+  function remember(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{try{localStorage.setItem(key,JSON.stringify(project));}catch{notice("Use Save project to keep this session.");}},250);}
+  function flushSave(){clearTimeout(saveTimer);try{localStorage.setItem(key,JSON.stringify(project));}catch{}}
+  window.addEventListener("pagehide",flushSave);
+  function select(index){selected=Math.max(0,Math.min(project.rings.length-1,index));board.setSelected(selected);updateSelection();}
+  const board=new SpringBoard($("board"),{
+    onPress(i){if(tab==="layout")return;if(demo)stopDemo(true);setContact(i,"pointer",true);},
+    onRelease(i){setContact(i,"pointer",false);},
+    onSelect(i){if(i>=0)select(i);},
+    onPick(i){pickSpring(i);},
+    onMove(i,x,y){if(!dragUndo){snapshot();dragUndo=true;}moveRing(i,x,y,false);},
+    onAdd(x,y){addRing(x,y);}
+  });
+  $("board").addEventListener("pointerdown",()=>dragUndo=false,true);
+  function applySceneColors(){
+    const colors=project.interferenceColors??palettePresets[0];
+    const channels=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
+    scene.setInterferenceColors(channels(colors.crest),channels(colors.trough));
+    scene.setInterferenceRandom(project.interferencePaletteMode==="random");
+  }
+  function syncPaletteControls(){
+    const colors=project.interferenceColors??palettePresets[0];
+    const preset=palettePresets.find(p=>p.crest===colors.crest && p.trough===colors.trough);
+    const random=project.interferencePaletteMode==="random";
+    $("wave-palette").value=random?"random":(preset?.id??"custom");
+    $("random-palette-hint").hidden=!random;
+    $("keep-colors").hidden=!random;
+    for(const phase of ["crest","trough"]){
+      const hex=colors[phase];
+      if($(phase+"-color").value!==hex)$(phase+"-color").value=hex;
+      $(phase+"-hex").textContent=hex.toUpperCase();
+    }
+    $("teensy-palette").textContent=random?"palette random":
+      "palette "+colors.crest.slice(1).toUpperCase()+" "+colors.trough.slice(1).toUpperCase();
+  }
+  function changeColors(colors){
+    setProjectColors(project,colors);
+    delete project.interferencePaletteMode;
+    if(scene)applySceneColors();
+    syncPaletteControls();remember();
+  }
+  function captureRandomColors(){
+    if(project.interferencePaletteMode!=="random" || !usesPairedWaves(project.mode))return;
+    const live=scene.getInterferenceColors();
+    const hex=channels=>"#"+channels.map(code=>code.toString(16).padStart(2,"0")).join("");
+    const crest=hex(live.crest),trough=hex(live.trough);
+    const displayed=project.interferenceColors??palettePresets[0];
+    if(crest===displayed.crest && trough===displayed.trough)return;
+    setProjectColors(project,{crest,trough});syncPaletteControls();remember();
+  }
+  function ensureScene(){
+    if(sceneDirty){scene=new SpringEngine.Scene(project.rings);applySceneColors();sceneDirty=false;contacts.clear();}
+    scene.setMode(project.mode[0]==="u"?0:Number(project.mode));
+  }
+  function setContact(i,source,on){
+    if(i<0||i>=project.rings.length)return;
+    ensureScene();let sources=contacts.get(i);
+    if(on){
+      if(!sources){
+        sources=new Set();contacts.set(i,sources);scene.press(i,Math.floor(simNow));
+        captureRandomColors();
+      }
+      sources.add(source);
+    }
+    else if(sources){sources.delete(source);if(!sources.size){contacts.delete(i);scene.release(i);}}
+  }
+  function releaseSource(source){for(const i of [...contacts.keys()])setContact(i,source,false);}
+  function cancelPair(){
+    if(pairFirst===null)return;
+    pairFirst=null;board.setTool(tab==="layout"?tool:"play");updateActions();
+  }
+  function pickSpring(i){
+    if(pairFirst===null)return;
+    if(pairFirst===-1){pairFirst=i;updateActions();notice("First spring selected. Choose a different spring.");return;}
+    if(i===pairFirst){notice("Choose a different spring for the second ripple.");return;}
+    const first=pairFirst;
+    cancelPair();
+    // Both edges use the same simulation timestamp, including while paused.
+    ensureScene();scene.beginInterferenceGroup();
+    for(const index of [first,i])setContact(index,"pair",true);
+    for(const index of [first,i])setContact(index,"pair",false);
+    notice("Simultaneous plucks on rings "+(first+1)+" and "+(i+1)+".");
+  }
+  function resetScene(){contacts.clear();sceneDirty=true;all=false;updateActions();}
+  function setActive(id){
+    cancelPair();
+    if(demo && id!==project.mode){releaseSource("demo");lastDemoBeat=-1;demoStart=simNow;}
+    project.mode=id;custom=id[0]==="u"?runtimePattern(project.patterns[Number(id.slice(1))]):null;
+    if(scene)scene.setMode(id[0]==="u"?0:Number(id));
+    $("pattern").value=id;
+    $("effect-count").hidden=!["7","8","9"].includes(id) && !usesPairedWaves(id);
+    $("pick-pair").hidden=!usesPairedWaves(id);
+    $("pick-pair").disabled=project.rings.length<2;
+    $("interference-colors").hidden=!usesPairedWaves(id);
+    if(usesPairedWaves(id))syncPaletteControls();
+    $("pattern-info").textContent=id[0]==="u"?(custom.kind==="wave"?"A custom touch wave from the pattern lab.":"A custom pattern evaluated separately for every LED."):descriptions[Number(id)];
+  }
+  function option(value,label){const opt=document.createElement("option");opt.value=value;opt.textContent=label;return opt;}
+  function patternMenus(){
+    const select=$("pattern"),drafts=$("drafts");select.replaceChildren();drafts.replaceChildren(option("-1","Create a pattern"));
+    modes.forEach((name,i)=>select.append(option(String(i),name)));
+    project.patterns.forEach((p,i)=>{select.append(option("u"+i,p.name));drafts.append(option(String(i),p.name));});
+    drafts.value=String(labIndex);setActive(project.mode);
+  }
+  function updateSelection(){
+    const r=project.rings[selected];if(!r)return;
+    const name="Ring "+String(selected+1).padStart(2,"0");
+    $("inspect-ring").textContent=name;$("layout-ring").textContent=name;
+    $("coord-x").value=+r.x.toFixed(2);$("coord-y").value=+r.y.toFixed(2);
+    $("remove").disabled=project.rings.length===1;
+  }
+  function syncLayout(){
+    $("arrangement").value=project.shape;$("rows").value=project.rows;$("cols").value=project.cols;
+    $("count").value=project.rings.length;$("spacing").value=project.spacing;$("spacing-range").value=project.spacing;
+    $("spacing-label").textContent=["custom","spiral"].includes(project.shape)?"Layout spacing scale":"Center spacing";
+    $("grid-inputs").hidden=!["grid","hex"].includes(project.shape);
+    $("count-field").hidden=!["circle","spiral"].includes(project.shape);
+    $("geometry-caption").textContent=shapeNames[project.shape]+" / "+project.rings.length+" rings / "+(project.rings.length*16).toLocaleString()+" LEDs";
+    $("project-label").value=project.name;
+    $("budget").min=$("budget-range").min=minimumBudget(project.rings.length);$("budget").value=project.budget;$("budget-range").value=project.budget;
+    $("pick-pair").disabled=project.rings.length<2;
+    $("undo").disabled=!history.length;updateSelection();
+  }
+  function snapshot(){
+    const {shape,rows,cols,count,spacing,rings}=project;
+    history.push({shape,rows,cols,count,spacing,rings:rings.map(r=>({...r})),selected});
+    if(history.length>32)history.shift();$("undo").disabled=false;
+  }
+  function changedLayout(refit=true){
+    const floor=minimumBudget(project.rings.length);
+    if(project.budget<floor){project.budget=floor;notice("Budget raised to "+floor+" A to cover the installed pixels at idle.");}
+    resetScene();frameResult=null;
+    selected=Math.min(selected,project.rings.length-1);
+    board.setLayout(project.rings,refit);board.setSelected(selected);syncLayout();remember();
+  }
+  function regenerate(shape,rows,cols,count,spacing){
+    if(!bounded(rows,1,32,true)||!bounded(cols,1,32,true)||!bounded(count,1,400,true)||(["grid","hex"].includes(shape)&&rows*cols>MAX_RINGS)){notice("Choose a layout with 1–400 rings, up to 32 rows or columns.");syncLayout();return;}
+    snapshot();Object.assign(project,{shape,rows,cols,spacing});
+    project.rings=geometry(shape,rows,cols,count,spacing);project.count=project.rings.length;
+    changedLayout();
+  }
+  function spacingChange(value,record=true){
+    if(!bounded(value,20,300)){notice("Spacing must be 20–300 mm.");syncLayout();return;}
+    if(value===project.spacing)return;
+    if(record)snapshot();
+    // Scale custom arrangements around their center so a previously translated board stays put.
+    const ratio=value/project.spacing,rings=project.rings;
+    const cx=rings.reduce((sum,r)=>sum+r.x,0)/rings.length,cy=rings.reduce((sum,r)=>sum+r.y,0)/rings.length;
+    const positions=rings.map(r=>({...r,x:cx+(r.x-cx)*ratio,y:cy+(r.y-cy)*ratio}));
+    if(positions.some(r=>Math.abs(r.x)>100000||Math.abs(r.y)>100000)){notice("Spacing would exceed the coordinate range.");syncLayout();return;}
+    project.rings=positions;project.spacing=value;changedLayout();
+  }
+  function moveRing(i,x,y,refit){
+    if(!project.rings[i]||!bounded(x,-100000,100000)||!bounded(y,-100000,100000)){notice("Coordinates must be within ±100,000 mm.");syncLayout();return;}
+    project.rings[i]={...project.rings[i],x,y};project.shape="custom";
+    sceneDirty=true;board.setLayout(project.rings,refit);syncLayout();remember();
+  }
+  function addRing(x,y){
+    if(project.rings.length>=MAX_RINGS){notice("The simulator supports up to 400 rings.");return;}
+    if(!bounded(x,-100000,100000)||!bounded(y,-100000,100000)){notice("Choose a position closer to the table.");return;}
+    snapshot();const row=Math.max(...project.rings.map(r=>r.row))+1;
+    project.rings=[...project.rings,{x,y,row,col:0}];project.shape="custom";project.count=project.rings.length;selected=project.count-1;
+    changedLayout(false);
+  }
+  function updateActions(){
+    $("demo").classList.toggle("active",demo);$("demo").setAttribute("aria-pressed",demo);$("demo").querySelector("span").textContent=demo?"Stop demo":"Run demo";
+    $("all").classList.toggle("active",all);$("all").setAttribute("aria-pressed",all);$("all").querySelector("span").textContent=all?"Release all":"Touch all";
+    $("pause").querySelector("span").textContent=paused?"Resume":"Pause";$("pause").querySelector("i").innerHTML=drawIcon(paused?"play":"pause");$("step").hidden=!paused;
+    $("move").classList.toggle("active",tool==="move");$("add").classList.toggle("active",tool==="add");
+    $("pick-pair").setAttribute("aria-pressed",pairFirst!==null);
+    const hint=pairFirst!==null?(pairFirst<0?"Pick the first spring · Esc to cancel":"Ring "+(pairFirst+1)+" selected · pick the second spring"):
+      tab==="layout"?(tool==="add"?"Click the board to add a ring":"Drag a ring to move it · Space + drag to pan"):demo?"Demo playing · brush a spring to take over":"Brush a spring to pluck it · click to inspect";
+    $("stage-hint").lastChild.textContent=hint;
+  }
+  function switchTab(next){
+    cancelPair();
+    if(next==="layout"){stopDemo(false);resetScene();}
+    if(tab==="layout"&&next!=="layout")sceneDirty=true;
+    tab=next;board.setTool(next==="layout"?tool:"play");
+    document.querySelectorAll("[data-tab]").forEach(b=>{const yes=b.dataset.tab===next;b.classList.toggle("selected",yes);b.setAttribute("aria-pressed",yes);});
+    ["play","layout","lab"].forEach(k=>$("pane-"+k).hidden=k!==next);updateActions();
+  }
+  function stopDemo(clear){if(!demo)return;demo=false;releaseSource("demo");if(clear)resetScene();updateActions();}
+  function startDemo(){cancelPair();resetScene();demo=true;demoStart=simNow;lastDemoBeat=-1;paused=false;updateActions();}
+  function tickDemo(){
+    const pairDemo=usesPairedWaves(project.mode);
+    const beatMs=pairDemo?3400:230;
+    const elapsed=simNow-demoStart,beat=Math.floor(elapsed/beatMs);
+    if(beat!==lastDemoBeat){
+      releaseSource("demo");lastDemoBeat=beat;
+      // Aim the sweep across the middle of any layout, with a two-touch ending.
+      const rings=project.rings, xs=rings.map(r=>r.x),ys=rings.map(r=>r.y);
+      const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
+      const cycle=beat%12;
+      const hit=(fx,fy,except=-1)=>{const x=minX+fx*(maxX-minX),y=minY+fy*(maxY-minY);let id=-1,best=Infinity;
+        rings.forEach((r,i)=>{const d=(r.x-x)**2+(r.y-y)**2;if(i!==except&&d<best){best=d;id=i;}});if(id>=0)setContact(id,"demo",true);return id;};
+      if(pairDemo){
+        scene.beginInterferenceGroup();
+        const horizontal=maxX-minX>=maxY-minY;
+        const first=hit(horizontal ? 0.28 : 0.5, horizontal ? 0.5 : 0.28);
+        hit(horizontal ? 0.72 : 0.5, horizontal ? 0.5 : 0.72, first);
+      }else{
+        if(cycle<8)hit(.23+cycle*.075,.48+.13*Math.sin(cycle*.9));
+        if(cycle===9){hit(.35,.28);hit(.68,.72);}
+      }
+    }
+    if(elapsed%beatMs>=115)releaseSource("demo");
+  }
+  function showPixels(out){
+    const off=selected*48;const cells=$("pixel-strip").children;
+    for(let p=0;p<16;p++){const k=off+p*3,c=out.pixels;cells[p].style.backgroundColor="rgb("+[c[k],c[k+1],c[k+2]].join(",")+")";cells[p].classList.toggle("sel",p===pixel);}
+    const k=off+pixel*3;$("led-number").textContent="LED "+String(pixel+1).padStart(2,"0");
+    $("pixel-value").textContent="RGB "+[...out.pixels.slice(k,k+3)].join(" / ");
+  }
+  function reading(id,v,unit){const el=$(id);if(el.firstChild.nodeType===3)el.firstChild.nodeValue=v+" ";else el.textContent=v;if(el.querySelector("small"))el.querySelector("small").textContent=unit;}
+  function render(){
+    if(tab==="layout"&&sceneDirty){
+      const count=project.rings.length*16;
+      frameResult={pixels:new Uint8Array(count*3),requestedMa:count,sentMa:count,gain:1};
+    }else{ensureScene();if(demo)tickDemo();frameResult=scene.frame(Math.floor(simNow),project.budget*1000,custom);}
+    const f=frameResult;board.draw(f.pixels,new Set(contacts.keys()));
+    if(!$("effect-count").hidden){
+      const n=f.activeWaves??f.activeOrbits??f.activeBalls??0;
+      const noun=project.mode==="7"?"ball":project.mode==="8"?"orbit":"wave";
+      const label=n+" active "+noun+(n===1?"":"s");
+      if($("effect-count").textContent!==label)$("effect-count").textContent=label;
+    }
+    reading("requested",(f.requestedMa/1000).toFixed(2),"A");reading("sent",(f.sentMa/1000).toFixed(2),"A");
+    reading("scale",(f.gain*100).toFixed(0),"%");$("touches").textContent=String(contacts.size);
+    $("powerbar").style.width=Math.min(100,100*f.sentMa/(1000*project.budget))+"%";$("powerbar").parentElement.classList.toggle("limited",f.gain<1);
+    showPixels(f);
+  }
+  function clock(real){
+    if(!paused)simNow+=Math.min(100,Math.max(0,real-prevReal));prevReal=real;
+    if(real-lastPaint>=15){render();lastPaint=real;}
+    requestAnimationFrame(clock);
+  }
+  document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+  $("pattern").onchange=()=>{setActive($("pattern").value);remember();};
+  const palettes=$("wave-palette");
+  for(const p of palettePresets)palettes.append(option(p.id,p.name));
+  palettes.append(option("random","Random per pluck pair"));
+  const customColors=option("custom","Custom colors");customColors.disabled=true;palettes.append(customColors);
+  palettes.onchange=()=>{
+    if(palettes.value==="random"){
+      project.interferencePaletteMode="random";
+      if(scene)scene.setInterferenceRandom(true);
+      syncPaletteControls();remember();return;
+    }
+    const preset=palettePresets.find(p=>p.id===palettes.value);
+    if(preset)changeColors(preset);
+  };
+  $("keep-colors").onclick=()=>changeColors(project.interferenceColors??palettePresets[0]);
+  for(const phase of ["crest","trough"]){
+    const picker=$(phase+"-color");
+    picker.oninput=picker.onchange=()=>{
+      const colors=project.interferenceColors??palettePresets[0];
+      if(colors[phase]!==picker.value)changeColors({...colors,[phase]:picker.value});
+    };
+  }
+  $("demo").onclick=()=>demo?stopDemo(false):startDemo();
+  $("all").onclick=()=>{
+    cancelPair();stopDemo(true);all=!all;
+    if(all){
+      ensureScene();if(usesPairedWaves(project.mode))scene.beginInterferenceGroup();
+      project.rings.forEach((_,i)=>setContact(i,"all",true));
+    }else releaseSource("all");
+    updateActions();
+  };
+  $("pick-pair").onclick=()=>{
+    if(pairFirst!==null){cancelPair();return;}
+    stopDemo(true);if(all){releaseSource("all");all=false;}
+    pairFirst=-1;board.setTool("pair");updateActions();$("board").focus({preventScroll:true});
+    notice("Choose two springs. Click each, or use the arrow keys and Enter.");
+  };
+  window.addEventListener("keydown",e=>{if(e.key==="Escape"&&pairFirst!==null){cancelPair();notice("Pair selection canceled.");}});
+  $("pause").onclick=()=>{paused=!paused;updateActions();};
+  $("step").onclick=()=>{simNow+=16;render();};
+  $("smaller").onclick=()=>board.zoom(1/1.25);$("bigger").onclick=()=>board.zoom(1.25);$("fit").onclick=()=>board.fit();
+  function budgetChange(value){const minimum=minimumBudget(project.rings.length);if(!bounded(value,minimum,60)){notice("Enter "+minimum+"–60 A. The minimum covers idle pixel current.");syncLayout();return;}project.budget=value;$("budget").value=value;$("budget-range").value=value;remember();}
+  $("budget-range").oninput=e=>budgetChange(+e.target.value);$("budget").onchange=e=>budgetChange(+e.target.value);
+  $("arrangement").onchange=e=>regenerate(e.target.value,project.rows,project.cols,project.rings.length,project.spacing);
+  for(const id of ["rows","cols","count"])$(id).onchange=()=>regenerate(project.shape,+$("rows").value,+$("cols").value,+$("count").value,project.spacing);
+  $("spacing").onchange=e=>spacingChange(+e.target.value);
+  let sliding=false;$("spacing-range").onpointerdown=()=>sliding=false;
+  $("spacing-range").oninput=e=>{spacingChange(+e.target.value,!sliding);sliding=true;};$("spacing-range").onchange=()=>sliding=false;
+  for(const id of ["move","add"])$(id).onclick=()=>{tool=id;board.setTool(tool);updateActions();};
+  for(const id of ["coord-x","coord-y"])$(id).onchange=()=>{snapshot();moveRing(selected,+$("coord-x").value,+$("coord-y").value,true);};
+  $("remove").onclick=()=>{if(project.rings.length<=1)return;snapshot();project.rings=project.rings.filter((_,i)=>i!==selected);project.count=project.rings.length;project.shape="custom";changedLayout();};
+  $("undo").onclick=()=>{const prev=history.pop();if(prev){selected=prev.selected;delete prev.selected;Object.assign(project,prev);changedLayout();}};
+  for(let p=0;p<16;p++){const b=document.createElement("button");b.setAttribute("aria-label","Inspect LED "+(p+1));b.onclick=()=>{pixel=p;if(frameResult)showPixels(frameResult);};$("pixel-strip").append(b);}
+  function loadDraft(index){
+    labIndex=index;$("drafts").value=String(index);const def=index<0?newWave():project.patterns[index];
+    $("lab-name").value=def.name;$("lab-kind").value=def.kind;$("lab-error").textContent="";
+    const wave=def.kind==="wave"?def:newWave();
+    for(const prop of ["shape","color","speed","width","reach","hold"])$("wave-"+prop).value=wave[prop];
+    (def.expr||EXAMPLE_EXPR).forEach((s,i)=>$("expr-"+"rgb"[i]).value=s);labFields();
+  }
+  function labFields(){const formula=$("lab-kind").value==="formula";$("wave-fields").hidden=formula;$("formula-fields").hidden=!formula;}
+  $("drafts").onchange=e=>loadDraft(+e.target.value);$("lab-kind").onchange=labFields;
+  $("apply").onclick=()=>{
+    try{
+      let def={name:$("lab-name").value,kind:$("lab-kind").value};
+      if(def.kind==="wave"){for(const p of ["shape","color"])def[p]=$("wave-"+p).value;for(const p of ["speed","width","reach","hold"])def[p]=+$("wave-"+p).value;}
+      else def.expr=[..."rgb"].map(ch=>$("expr-"+ch).value);
+      def=validatePattern(def);
+      if(labIndex<0){if(project.patterns.length>=100)throw Error("The project already has 100 patterns.");labIndex=project.patterns.length;project.patterns.push(def);}else project.patterns[labIndex]=def;
+      project.mode="u"+labIndex;patternMenus();resetScene();startDemo();$("lab-error").textContent="";remember();notice("Testing "+def.name+". Brush a spring to take over.");
+    }catch(e){$("lab-error").textContent=e.message;}
+  };
+  $("open").onclick=()=>$("file").click();
+  $("project-label").onchange=e=>{project.name=e.target.value.trim()||"Studio table";e.target.value=project.name;remember();};
+  $("file").onchange=async e=>{
+    const f=e.target.files[0];e.target.value="";if(!f)return;
+    try{
+      if(f.size>1024*1024)throw Error("Choose a project smaller than 1 MB.");
+      const next=validateProject(JSON.parse(await f.text()));
+      stopDemo(false);all=false;contacts.clear();history.length=0;project=next;selected=0;labIndex=-1;paused=false;
+      changedLayout();patternMenus();loadDraft(-1);switchTab("play");remember();notice("Opened "+f.name);
+    }catch(error){notice("Open failed. "+error.message);}
+  };
+  $("save").onclick=()=>{
+    const blob=new Blob([JSON.stringify(project,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob);
+    const stem=project.name.replace(/[^\w .-]/g,"").trim().slice(0,70)||"project";
+    const a=document.createElement("a");a.href=url;a.download="SpringTable-"+stem+".json";document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);flushSave();notice("Project exported.");
+  };
+  board.setLayout(project.rings);board.setSelected(selected);syncLayout();patternMenus();loadDraft(-1);switchTab("play");
+  if(!restored&&!matchMedia("(prefers-reduced-motion: reduce)").matches)startDemo();
+  render();requestAnimationFrame(clock);
+})();
+</script></body></html>
