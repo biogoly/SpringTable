@@ -10,9 +10,9 @@ The animation below uses the sketch's ripple renderer with simulated touches. A 
 
 ## Try the table on screen
 
-From GitHub, choose **Code → Download ZIP**, extract it, and open `SpringTable Studio.html`. To build the physical table, open [`SpringTable/SpringTable.ino`](SpringTable/SpringTable.ino) in the Arduino IDE. The root `ReactTable.ino` is the original IR sketch.
+**[Launch SpringTable Studio](https://biogoly.github.io/SpringTable/)** in your browser. On first launch it plays a demo sweep. Move the mouse across a ring to take over, or hold the mouse button on a spring for a sustained touch. Touchscreens support simultaneous fingers. With the canvas focused, use the arrow keys to select a spring and Enter to hold it.
 
-Open **[SpringTable Studio](SpringTable%20Studio.html)** in a desktop browser. It runs entirely from the one HTML file, including when offline. On first launch it plays a demo sweep. Move the mouse across a ring to take over, or hold the mouse button on a spring for a sustained touch. Touchscreens support simultaneous fingers. With the canvas focused, use the arrow keys to select a spring and Enter to hold it.
+For offline use, choose **Code → Download ZIP** on GitHub, extract it, and open `SpringTable Studio.html`. To build the physical table, open [`SpringTable/SpringTable.ino`](SpringTable/SpringTable.ino) in the Arduino IDE. The root `ReactTable.ino` is the original IR sketch.
 
 - **Play** selects any of the twelve firmware effects. Click a ring and pick one of its 16 pixels in the inspector to see its transmitted RGB values. Pause and step in 16 ms increments to inspect motion. **Touch all** and the current budget control let you see whole-frame dimming and compare requested and sent current.
 - **Layout** can generate a grid, hexagonal lattice, circle or spiral, up to 400 rings. Set the count or dimensions, change spacing in millimeters, drag individual rings, or use **Add ring** and click on the board. You can enter exact X/Y positions, remove rings and undo layout changes. **Fit** frames the board, and Space-drag or middle-drag pans. The default ring drawing is 38 mm in diameter, and the standard grid has 60 mm center spacing. For a bench comparison, set one row, three columns, 60 mm spacing and a 1.5 A budget.

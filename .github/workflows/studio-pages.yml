@@ -1,0 +1,43 @@
+name: Deploy SpringTable Studio
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'studio/**'
+      - '.github/workflows/studio-pages.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: studio-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build the standalone Studio
+        run: |
+          node studio/build.cjs
+          mkdir site
+          cp 'SpringTable Studio.html' site/index.html
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish the Studio
+        id: deployment
+        uses: actions/deploy-pages@v4
