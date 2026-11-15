@@ -16,6 +16,7 @@
   let selected=0,pixel=0,tab="play",tool="move",custom=null,scene,sceneDirty=true;
   let simNow=0,prevReal=performance.now(),paused=false,demo=false,all=false,lastDemoBeat=-1,demoStart=0;
   let labIndex=-1,lastPaint=0,frameResult=null,saveTimer=0,noticeTimer=0,dragUndo=false;
+  let placementPlan=null, placementFrame=0, highlightedPlacementRow=null;
   let pairFirst=null; // null: normal input; -1: waiting for the first of two picks
   const contacts=new Map(),history=[];
   function notice(msg){$("message").textContent=msg;clearTimeout(noticeTimer);noticeTimer=setTimeout(()=>$("message").textContent="",6000);}
@@ -126,12 +127,85 @@
     const r=project.rings[selected];if(!r)return;
     const name="Ring "+String(selected+1).padStart(2,"0");
     $("inspect-ring").textContent=name;$("layout-ring").textContent=name;
-    $("coord-x").value=+r.x.toFixed(2);$("coord-y").value=+r.y.toFixed(2);
+    $("coord-x").value=+r.x.toFixed(3);$("coord-y").value=+r.y.toFixed(3);
     $("remove").disabled=project.rings.length===1;
+    updatePlacementSelection();
+  }
+  function getPlacementPlan(){
+    if(!placementPlan){
+      const diameter = project.placement?.diameter ?? 38;
+      const margin = project.placement?.margin ?? 0;
+      placementPlan = SpringPlacement.makePlan(project.rings, diameter, margin);
+    }
+    return placementPlan;
+  }
+  function updatePlacementSelection(){
+    if(tab!=="layout" || !placementPlan || !$("placement-coordinates").open)return;
+    const point = placementPlan.points[selected];
+    $("placement-selected").textContent = `Selected ring ${point.id} · X ${point.x.toFixed(3)} / Y ${point.y.toFixed(3)} mm`;
+    highlightedPlacementRow?.removeAttribute("aria-current");
+    highlightedPlacementRow = $("placement-rows").rows[selected];
+    highlightedPlacementRow?.setAttribute("aria-current", "true");
+  }
+  function updatePlacementRows(points){
+    const body = $("placement-rows");
+    while(body.rows.length > points.length)body.deleteRow(-1);
+    for(const [index, point] of points.entries()){
+      let row = body.rows[index];
+      if(!row){
+        row = body.insertRow();
+        const header = document.createElement("th");
+        header.scope = "row";
+        header.textContent = point.id;
+        row.append(header);
+        row.insertCell();
+        row.insertCell();
+      }
+      const x = point.x.toFixed(3), y = point.y.toFixed(3);
+      if(row.cells[1].textContent!==x)row.cells[1].textContent = x;
+      if(row.cells[2].textContent!==y)row.cells[2].textContent = y;
+    }
+    updatePlacementSelection();
+  }
+  function renderPlacement(){
+    placementFrame = 0;
+    if(tab!=="layout")return;
+    const plan = getPlacementPlan();
+    for(const setting of ["diameter","margin"]){
+      const field = $("placement-" + setting);
+      if(field !== document.activeElement)field.value = plan[setting];
+    }
+    $("placement-size").textContent = `${plan.width.toFixed(3)} × ${plan.height.toFixed(3)} mm`;
+    const nearest = plan.minDistance;
+    const gap = nearest === null ? null : nearest - plan.diameter;
+    const overlap = gap !== null && gap < -1e-8;
+    const clearance = $("placement-gap");
+    clearance.classList.toggle("overlap", overlap);
+    if(nearest === null){
+      clearance.textContent = "Add a second ring to measure the gap.";
+    }else{
+      clearance.textContent = `Closest centers ${nearest.toFixed(3)} mm · ` +
+        (overlap ? `Ring outlines overlap by ${(-gap).toFixed(3)} mm.` : `Edge gap ${Math.max(0, gap).toFixed(3)} mm.`);
+      if(nearest===0)clearance.textContent += " Move rings with coincident centers apart to apply a gap.";
+    }
+    const canScale = nearest !== null && nearest > 0;
+    $("placement-apply-gap").disabled = !canScale;
+    $("placement-target-gap").disabled = !canScale;
+    if($("placement-coordinates").open)updatePlacementRows(plan.points);
+  }
+  function invalidatePlacement(){
+    placementPlan = null;
+    board.setPlacementDimensions(project.placement?.diameter ?? 38, project.placement?.margin ?? 0);
+    if(tab==="layout" && !placementFrame)placementFrame = requestAnimationFrame(renderPlacement);
   }
   function syncLayout(){
     $("arrangement").value=project.shape;$("rows").value=project.rows;$("cols").value=project.cols;
-    $("count").value=project.rings.length;$("spacing").value=project.spacing;$("spacing-range").value=project.spacing;
+    $("count").value=project.rings.length;
+    $("spacing").value=Number(project.spacing.toFixed(8));
+    const spacingRange=$("spacing-range");
+    spacingRange.min=Math.min(20,project.spacing);
+    spacingRange.max=Math.max(300,project.spacing);
+    spacingRange.value=project.spacing;
     $("spacing-label").textContent=["custom","spiral"].includes(project.shape)?"Layout spacing scale":"Center spacing";
     $("grid-inputs").hidden=!["grid","hex"].includes(project.shape);
     $("count-field").hidden=!["circle","spiral"].includes(project.shape);
@@ -139,6 +213,7 @@
     $("project-label").value=project.name;
     $("budget").min=$("budget-range").min=minimumBudget(project.rings.length);$("budget").value=project.budget;$("budget-range").value=project.budget;
     $("pick-pair").disabled=project.rings.length<2;
+    invalidatePlacement();
     $("undo").disabled=!history.length;updateSelection();
   }
   function snapshot(){
@@ -155,20 +230,30 @@
   }
   function regenerate(shape,rows,cols,count,spacing){
     if(!bounded(rows,1,32,true)||!bounded(cols,1,32,true)||!bounded(count,1,400,true)||(["grid","hex"].includes(shape)&&rows*cols>MAX_RINGS)){notice("Choose a layout with 1–400 rings, up to 32 rows or columns.");syncLayout();return;}
-    snapshot();Object.assign(project,{shape,rows,cols,spacing});
-    project.rings=geometry(shape,rows,cols,count,spacing);project.count=project.rings.length;
+    const rings=geometry(shape,rows,cols,count,spacing);
+    if(!rings.every(validRingCenter)){notice("Reduce the spacing or ring count to keep centers within ±100,000 mm.");syncLayout();return;}
+    snapshot();Object.assign(project,{shape,rows,cols,spacing,rings,count:rings.length});
     changedLayout();
   }
   function spacingChange(value,record=true){
-    if(!bounded(value,20,300)){notice("Spacing must be 20–300 mm.");syncLayout();return;}
-    if(value===project.spacing)return;
-    if(record)snapshot();
+    if(!bounded(value,MIN_SPACING_MM,MAX_SPACING_MM)){notice("Choose a spacing scale between 0.001 and 100,000 mm.");syncLayout();return false;}
+    if(value===project.spacing)return true;
     // Scale custom arrangements around their center so a previously translated board stays put.
     const ratio=value/project.spacing,rings=project.rings;
     const cx=rings.reduce((sum,r)=>sum+r.x,0)/rings.length,cy=rings.reduce((sum,r)=>sum+r.y,0)/rings.length;
     const positions=rings.map(r=>({...r,x:cx+(r.x-cx)*ratio,y:cy+(r.y-cy)*ratio}));
-    if(positions.some(r=>Math.abs(r.x)>100000||Math.abs(r.y)>100000)){notice("Spacing would exceed the coordinate range.");syncLayout();return;}
+    if(!positions.every(validRingCenter)){notice("Spacing would exceed the coordinate range.");syncLayout();return false;}
+    if(record)snapshot();
     project.rings=positions;project.spacing=value;changedLayout();
+    return true;
+  }
+  function applyMinimumGap(gap){
+    const plan=getPlacementPlan();
+    if(!Number.isFinite(gap) || gap<0 || !(plan.minDistance>0))return false;
+    const scale=project.spacing*((plan.diameter+gap)/plan.minDistance);
+    if(!spacingChange(scale))return false;
+    notice("Minimum edge gap set to "+gap+" mm.");
+    return true;
   }
   function moveRing(i,x,y,refit){
     if(!project.rings[i]||!bounded(x,-100000,100000)||!bounded(y,-100000,100000)){notice("Coordinates must be within ±100,000 mm.");syncLayout();return;}
@@ -199,6 +284,7 @@
     tab=next;board.setTool(next==="layout"?tool:"play");
     document.querySelectorAll("[data-tab]").forEach(b=>{const yes=b.dataset.tab===next;b.classList.toggle("selected",yes);b.setAttribute("aria-pressed",yes);});
     ["play","layout","lab"].forEach(k=>$("pane-"+k).hidden=k!==next);updateActions();
+    if(next==="layout")renderPlacement();
   }
   function stopDemo(clear){if(!demo)return;demo=false;releaseSource("demo");if(clear)resetScene();updateActions();}
   function startDemo(){cancelPair();resetScene();demo=true;demoStart=simNow;lastDemoBeat=-1;paused=false;updateActions();}
@@ -302,10 +388,45 @@
   $("arrangement").onchange=e=>regenerate(e.target.value,project.rows,project.cols,project.rings.length,project.spacing);
   for(const id of ["rows","cols","count"])$(id).onchange=()=>regenerate(project.shape,+$("rows").value,+$("cols").value,+$("count").value,project.spacing);
   $("spacing").onchange=e=>spacingChange(+e.target.value);
+  $("placement-coordinates").ontoggle = () => {
+    if($("placement-coordinates").open && tab==="layout")updatePlacementRows(getPlacementPlan().points);
+  };
+  for(const setting of ["diameter", "margin"]){
+    const field = $("placement-" + setting);
+    field.onchange = () => {
+      const plan = getPlacementPlan();
+      if(!field.validity.valid){
+        notice(`Enter a value between ${field.min} and ${field.max} mm. Restored ${plan[setting]} mm.`);
+        field.value = plan[setting];
+        return;
+      }
+      project.placement = {diameter:plan.diameter, margin:plan.margin, [setting]:field.valueAsNumber};
+      invalidatePlacement();
+      remember();
+    };
+  }
+  const targetGap = $("placement-target-gap");
+  $("placement-apply-gap").onclick = () => {
+    if(targetGap.reportValidity())applyMinimumGap(targetGap.valueAsNumber);
+  };
+  targetGap.onkeydown = event => {
+    if(event.key==="Enter"){
+      event.preventDefault();
+      $("placement-apply-gap").click();
+    }
+  };
+  $("placement-csv").onclick = () => downloadFile(SpringPlacement.csv(getPlacementPlan()), "text/csv;charset=utf-8", "-placement.csv");
+  $("placement-svg").onclick = () => downloadFile(SpringPlacement.svg(getPlacementPlan()), "image/svg+xml", "-placement.svg");
   let sliding=false;$("spacing-range").onpointerdown=()=>sliding=false;
   $("spacing-range").oninput=e=>{spacingChange(+e.target.value,!sliding);sliding=true;};$("spacing-range").onchange=()=>sliding=false;
   for(const id of ["move","add"])$(id).onclick=()=>{tool=id;board.setTool(tool);updateActions();};
-  for(const id of ["coord-x","coord-y"])$(id).onchange=()=>{snapshot();moveRing(selected,+$("coord-x").value,+$("coord-y").value,true);};
+  for(const axis of ["x","y"]){
+    $("coord-"+axis).onchange = event => {
+      const point = {...project.rings[selected], [axis]:event.target.valueAsNumber};
+      snapshot();
+      moveRing(selected, point.x, point.y, true);
+    };
+  }
   $("remove").onclick=()=>{if(project.rings.length<=1)return;snapshot();project.rings=project.rings.filter((_,i)=>i!==selected);project.count=project.rings.length;project.shape="custom";changedLayout();};
   $("undo").onclick=()=>{const prev=history.pop();if(prev){selected=prev.selected;delete prev.selected;Object.assign(project,prev);changedLayout();}};
   for(let p=0;p<16;p++){const b=document.createElement("button");b.setAttribute("aria-label","Inspect LED "+(p+1));b.onclick=()=>{pixel=p;if(frameResult)showPixels(frameResult);};$("pixel-strip").append(b);}
@@ -335,14 +456,18 @@
     try{
       if(f.size>1024*1024)throw Error("Choose a project smaller than 1 MB.");
       const next=validateProject(JSON.parse(await f.text()));
-      stopDemo(false);all=false;contacts.clear();history.length=0;project=next;selected=0;labIndex=-1;paused=false;
+      stopDemo(false);all=false;contacts.clear();history.length=0;project=next;selected=0;labIndex=-1;paused=false;targetGap.value="";
       changedLayout();patternMenus();loadDraft(-1);switchTab("play");remember();notice("Opened "+f.name);
     }catch(error){notice("Open failed. "+error.message);}
   };
-  $("save").onclick=()=>{
-    const blob=new Blob([JSON.stringify(project,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob);
+  function downloadFile(content, type, suffix){
+    const url=URL.createObjectURL(new Blob([content],{type}));
     const stem=project.name.replace(/[^\w .-]/g,"").trim().slice(0,70)||"project";
-    const a=document.createElement("a");a.href=url;a.download="SpringTable-"+stem+".json";document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);flushSave();notice("Project exported.");
+    const a=document.createElement("a");a.href=url;a.download="SpringTable-"+stem+suffix;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);
+  }
+  $("save").onclick=()=>{
+    downloadFile(JSON.stringify(project,null,2), "application/json", ".json");
+    flushSave();notice("Project exported.");
   };
   board.setLayout(project.rings);board.setSelected(selected);syncLayout();patternMenus();loadDraft(-1);switchTab("play");
   if(!restored&&!matchMedia("(prefers-reduced-motion: reduce)").matches)startDemo();

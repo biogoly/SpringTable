@@ -43,11 +43,43 @@
         <div class="control-group"><label for="arrangement">Arrangement</label><select id="arrangement"><option value="grid">Rectangular grid</option><option value="hex">Hexagonal lattice</option><option value="circle">Circle</option><option value="spiral">Spiral</option><option value="custom" disabled>Custom layout</option></select>
           <div id="grid-inputs" class="field-pair"><label>Rows<input id="rows" type="number" min="1" max="32"></label><label>Columns<input id="cols" type="number" min="1" max="32"></label></div>
           <label id="count-field" class="subfield" hidden>Ring count<input id="count" type="number" min="1" max="400"></label>
-          <label for="spacing" class="subfield"><span id="spacing-label">Center spacing</span> <span class="unit">mm</span></label><div class="sliderline"><input id="spacing-range" aria-label="Layout spacing in millimeters" type="range" min="20" max="300" step="1"><input id="spacing" type="number" min="20" max="300" step="1"></div>
+          <label for="spacing" class="subfield"><span id="spacing-label">Center spacing</span> <span class="unit">mm</span></label><div class="sliderline"><input id="spacing-range" aria-label="Layout spacing in millimeters" type="range" min="20" max="300" step="1"><input id="spacing" type="number" min="0.001" max="100000" step="any"></div>
           <p class="help">The firmware grid corresponds to 60 mm here. Moving springs changes how long a wave takes to reach them.</p>
         </div>
+        <section class="control-group placement" aria-labelledby="placement-heading">
+          <h3 id="placement-heading">Placement plan</h3>
+          <div class="field-pair">
+            <label for="placement-diameter">Ring outer Ø · mm<input id="placement-diameter" type="number" min="1" max="1000" step="any" required value="38"></label>
+            <label for="placement-margin">Board margin · mm<input id="placement-margin" type="number" min="0" max="10000" step="any" required value="0"></label>
+          </div>
+          <div class="placement-size"><span>Board width × height</span><strong id="placement-size"></strong></div>
+          <p class="help">The board outline includes the clearance between the outer rings and each board edge.</p>
+          <p id="placement-gap" class="help"></p>
+          <label for="placement-target-gap" class="subfield">Set minimum edge gap · mm</label>
+          <div class="placement-gap-controls">
+            <input id="placement-target-gap" type="number" min="0" step="any" required placeholder="e.g. 5">
+            <button id="placement-apply-gap" type="button">Apply gap</button>
+          </div>
+          <p class="help">Applying a gap scales the layout about its center.</p>
+          <details id="placement-coordinates">
+            <summary>Ring center coordinates</summary>
+            <p id="placement-origin">Face the front of the board. Measure X right from the left edge and Y down from the top edge.</p>
+            <p id="placement-selected" class="mono"></p>
+            <div class="placement-table" tabindex="0" role="region" aria-label="Scrollable ring coordinates">
+              <table aria-describedby="placement-origin">
+                <caption>Ring centers in millimeters</caption>
+                <thead><tr><th scope="col">Ring</th><th scope="col">X from left</th><th scope="col">Y from top</th></tr></thead>
+                <tbody id="placement-rows"></tbody>
+              </table>
+            </div>
+          </details>
+          <div class="paired actions">
+            <button id="placement-csv" type="button">Coordinates CSV</button>
+            <button id="placement-svg" type="button">1:1 drawing SVG</button>
+          </div>
+        </section>
         <div class="control-group"><h3>Canvas tool</h3><div class="paired"><button id="move"><i data-icon="move"></i>Move</button><button id="add"><i data-icon="plus"></i>Add ring</button></div></div>
-        <div class="control-group last"><div class="group-title"><h3>Selected ring</h3><span id="layout-ring" class="mono"></span></div><div class="field-pair"><label>X · mm<input id="coord-x" type="number" step="1"></label><label>Y · mm<input id="coord-y" type="number" step="1"></label></div><div class="paired actions"><button id="remove"><i data-icon="minus"></i>Remove</button><button id="undo"><i data-icon="undo"></i>Undo layout</button></div></div>
+        <div class="control-group last"><div class="group-title"><h3>Selected ring</h3><span id="layout-ring" class="mono"></span></div><div class="field-pair"><label>Layout X · mm<input id="coord-x" type="number" step="any"></label><label>Layout Y · mm<input id="coord-y" type="number" step="any"></label></div><div class="paired actions"><button id="remove"><i data-icon="minus"></i>Remove</button><button id="undo"><i data-icon="undo"></i>Undo layout</button></div></div>
       </section>
       <section id="pane-lab" hidden>
         <div class="panel-title"><i data-icon="wave"></i><h2>Pattern lab</h2></div>

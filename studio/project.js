@@ -57,6 +57,10 @@ function runtimePattern(def) {
   return {...def,paint:c=>[compiled[0](c),compiled[1](c),compiled[2](c)]};
 }
 const MAX_RINGS=400, SHAPES=["grid","hex","circle","spiral","custom"];
+const MIN_SPACING_MM=0.001, MAX_SPACING_MM=100000;
+function validRingCenter(ring) {
+  return bounded(ring.x,-100000,100000) && bounded(ring.y,-100000,100000);
+}
 function geometry(shape,rows,cols,count,pitch){
   const rings=[];
   if(shape==="grid"||shape==="hex"){
@@ -105,8 +109,8 @@ function validatePattern(p){
 }
 function validateProject(p){
   if(!p||p.format!=="springtable-studio"||p.version!==1)throw Error("Choose a SpringTable Studio version 1 project.");
-  if(!SHAPES.includes(p.shape)||!bounded(p.rows,1,32,true)||!bounded(p.cols,1,32,true)||!bounded(p.count,1,MAX_RINGS,true)||!bounded(p.spacing,20,300)||!bounded(p.budget,.1,60)||!Array.isArray(p.rings)||p.rings.length<1||p.rings.length>MAX_RINGS)throw Error("The saved layout settings are outside the supported range.");
-  const rings=p.rings.map(r=>{if(!r||!bounded(r.x,-100000,100000)||!bounded(r.y,-100000,100000)||!bounded(r.row,0,100000,true)||!bounded(r.col,0,100000,true))throw Error("Invalid ring position.");return {x:r.x,y:r.y,row:r.row,col:r.col};});
+  if(!SHAPES.includes(p.shape)||!bounded(p.rows,1,32,true)||!bounded(p.cols,1,32,true)||!bounded(p.count,1,MAX_RINGS,true)||!bounded(p.spacing,MIN_SPACING_MM,MAX_SPACING_MM)||!bounded(p.budget,.1,60)||!Array.isArray(p.rings)||p.rings.length<1||p.rings.length>MAX_RINGS)throw Error("The saved layout settings are outside the supported range.");
+  const rings=p.rings.map(r=>{if(!r||!validRingCenter(r)||!bounded(r.row,0,100000,true)||!bounded(r.col,0,100000,true))throw Error("Invalid ring position.");return {x:r.x,y:r.y,row:r.row,col:r.col};});
   if(p.budget<minimumBudget(rings.length))throw Error("The budget must cover the idle current for all installed pixels.");
   if((p.shape==="grid"||p.shape==="hex")&&p.rows*p.cols!==rings.length)throw Error("Ring count does not match grid dimensions.");
   if(!Array.isArray(p.patterns)||p.patterns.length>100)throw Error("Invalid pattern collection.");
@@ -114,6 +118,13 @@ function validateProject(p){
   if(typeof p.mode!=="string"||!(/^(?:[0-9]|1[01])$/.test(p.mode)||(/^u\d+$/.test(p.mode)&&Number(p.mode.slice(1))<patterns.length)))throw Error("Unknown active pattern.");
   if(typeof p.name!=="string"||p.name.length>80)throw Error("Invalid project name.");
   const project={format:p.format,version:1,name:p.name,shape:p.shape,rows:p.rows,cols:p.cols,count:p.count,spacing:p.spacing,budget:p.budget,mode:p.mode,rings,patterns};
+  if(Object.hasOwn(p,"placement")){
+    const settings=p.placement;
+    if(!settings || !bounded(settings.diameter,1,1000) || !bounded(settings.margin,0,10000)){
+      throw Error("Check the mounting plan's ring diameter (1–1000 mm) and edge margin (0–10000 mm).");
+    }
+    project.placement={diameter:settings.diameter,margin:settings.margin};
+  }
   if(Object.hasOwn(p,"interferenceColors"))setProjectColors(project,p.interferenceColors);
   if(Object.hasOwn(p,"interferencePaletteMode")){
     if(p.interferencePaletteMode==="random")project.interferencePaletteMode="random";

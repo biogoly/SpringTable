@@ -32,6 +32,8 @@
       this.selected = -1;
       this.hover = -1;
       this.tool = 'play';
+      this.placementRadius = radiusMM;
+      this.edgeMargin = 0;
       this.center = {x: 0, y: 0};
       this.zoomFactor = 1;
       this.scale = 1;
@@ -92,10 +94,27 @@
 
     setTool(tool) {
       if (!['play', 'move', 'add', 'pair'].includes(tool) || this.tool === tool) return;
+      const wasLayout = this.isLayout;
       this.resetInputs();
       this.tool = tool;
+      if (wasLayout !== this.isLayout) {
+        this.scale = this.fitScale() * this.zoomFactor;
+        this.staticDirty = true;
+      }
       this.setCursor();
       this.repaint();
+    }
+
+    get isLayout() { return this.tool === 'move' || this.tool === 'add'; }
+
+    get ringRadius() { return this.isLayout ? this.placementRadius : radiusMM; }
+
+    setPlacementDimensions(diameter, margin) {
+      const radius = diameter / 2;
+      if (this.placementRadius === radius && this.edgeMargin === margin) return;
+      this.placementRadius = radius;
+      this.edgeMargin = margin;
+      if (this.isLayout) this.fit();
     }
 
     setSelected(index) {
@@ -110,8 +129,9 @@
         left = Math.min(left, x); right = Math.max(right, x);
         top = Math.min(top, y); bottom = Math.max(bottom, y);
       }
+      const inset = this.ringRadius + (this.isLayout ? this.edgeMargin : 0);
       return {x: (left + right) / 2, y: (top + bottom) / 2,
-              w: right - left + radiusMM * 2, h: bottom - top + radiusMM * 2};
+              w: right - left + inset * 2, h: bottom - top + inset * 2};
     }
 
     fitScale(bounds = this.bounds()) {
@@ -164,7 +184,7 @@
     hit(point) {
       const s = this.screen(point);
       if (s.x < 0 || s.y < 0 || s.x > this.width || s.y > this.height) return -1;
-      let closest = -1, best = radiusMM ** 2;
+      let closest = -1, best = this.ringRadius ** 2;
       for (let i = 0; i < this.rings.length; i++) {
         const r = this.rings[i];
         const d = (r.x - point.x) ** 2 + (r.y - point.y) ** 2;
@@ -343,7 +363,7 @@
     reveal(index) {
       if (index < 0) return;
       const {x, y} = this.screen(this.rings[index]);
-      const margin = Math.min(radiusMM * this.scale + 5, this.width / 2, this.height / 2);
+      const margin = Math.min(this.ringRadius * this.scale + 5, this.width / 2, this.height / 2);
       const targetX = clamp(x, margin, this.width - margin);
       const targetY = clamp(y, margin, this.height - margin);
       if (targetX === x && targetY === y) return;
@@ -400,7 +420,8 @@
       const ctx = this.base.getContext('2d'), w = this.width, h = this.height;
       ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
-      const origin = this.screen({x: 0, y: 0});
+      const board = this.isLayout && this.rings.length ? this.bounds() : null;
+      const origin = this.screen(board ? {x: board.x - board.w / 2, y: board.y - board.h / 2} : {x: 0, y: 0});
       let grid = 25 * this.scale;
       while (grid < 15) grid *= 2;
       while (grid > 75) grid /= 2;
@@ -418,7 +439,24 @@
         }
       }
       ctx.stroke();
-      const radius = this.scale * radiusMM;
+      if (board) {
+        const boardWidth = board.w * this.scale, boardHeight = board.h * this.scale;
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#79a99c';
+        ctx.strokeRect(origin.x, origin.y, boardWidth, boardHeight);
+        const arm = Math.min(12, boardWidth / 2, boardHeight / 2);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#b4edda';
+        ctx.beginPath();
+        ctx.moveTo(origin.x + arm, origin.y);
+        ctx.lineTo(origin.x, origin.y);
+        ctx.lineTo(origin.x, origin.y + arm);
+        ctx.stroke();
+        ctx.fillStyle = '#b4edda';
+        ctx.font = '11px sans-serif';
+        ctx.fillText('0, 0', origin.x + 3, origin.y - 4);
+      }
+      const radius = this.scale * this.ringRadius;
       this.visible = [];
       for (let i = 0; i < this.rings.length; i++) {
         const {x, y} = this.screen(this.rings[i]);
@@ -454,7 +492,7 @@
       if (!this.width || !this.height) return;
       if ((window.devicePixelRatio || 1) !== this.dpr) { this.resize(); return; }
       if (this.staticDirty) this.paintBase();
-      const ctx = this.ctx, radius = radiusMM * this.scale, track = emitterRadiusMM * this.scale;
+      const ctx = this.ctx, radius = this.ringRadius * this.scale, track = radius * (emitterRadiusMM / radiusMM);
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       ctx.drawImage(this.base, 0, 0);

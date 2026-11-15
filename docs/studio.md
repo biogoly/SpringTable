@@ -35,6 +35,17 @@ Choose **Pause**, then **+16 ms** to advance one frame at a time. Select a ring 
 
 In **Layout**, generate a rectangular grid, hexagonal lattice, circle, or spiral with up to 400 rings. Increase the spacing to give traveling waves more distance to cross. Drag a ring or enter its X and Y coordinates in millimeters. **Add ring** places a ring at the next click, **Undo layout** reverses an edit, and **Fit** brings the whole board back into view.
 
+### Lay out a display board
+
+1. Choose an arrangement and ring count. Under **Placement plan**, enter the measured **ring outer diameter** and the **board margin**. The margin is the clear border between the outermost ring edges and the sides of the board.
+2. Set the **minimum edge gap** and click **Apply gap**. Studio scales the layout until the closest pair of ring edges has that clearance. On a spiral the distances between neighbors vary. The spacing slider controls the overall scale, and the plan reports the actual closest spacing.
+3. Expand **Ring center coordinates**. Facing the front of the board, use the top-left corner as zero. Measure X to the right and Y down to mark each spring center. The board dimensions and centers update when rings move.
+4. Download **Coordinates CSV** for the numbered measurements or **1:1 drawing SVG** for a full-size drawing with ring outlines and center marks. Both use millimeters and the same ring numbers. For a paper template, print the SVG at actual size and check a known dimension before marking the board.
+
+For example, choose **Spiral**, enter **200** rings, set the outer diameter to **38 mm** and the margin to **10 mm**, then apply a **10 mm** minimum edge gap. The closest centers are 48 mm apart. The board measures approximately **1,400.065 × 1,386.198 mm**. Choose **Save project** to keep the geometry and mounting dimensions together. [Example project](../examples/200-ring-spiral/200-ring-spiral.json) · [Coordinate sheet](../examples/200-ring-spiral/200-ring-spiral.csv) · [Full-size drawing](../examples/200-ring-spiral/200-ring-spiral.svg)
+
+### Create a pattern
+
 In **Pattern lab**, choose **Create a pattern**. A **Touch wave** has controls for shape, color, speed, reach, trail, and held glow. For a moving red dot, choose **Pixel formulas** and enter one expression per channel.
 
 | Red | Green | Blue |

@@ -16,6 +16,35 @@
 .palette-fields>div{flex:1;min-width:0}.palette-fields label{margin-bottom:5px}.palette-swatch{display:flex;align-items:center;gap:6px}
 .palette-swatch input[type=color]{width:35px;height:32px;min-height:32px;margin:0;padding:2px;cursor:pointer}
 .palette-swatch code,.palette-detail code{font:11px var(--mono);color:var(--ink)}.palette-detail code{display:block;margin-top:6px;user-select:all}
+.placement-size {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-left: 3px solid #6d8f6a;
+  background: #e6ecde;
+}
+.placement-size span { display: block; font-size: 12px; color: var(--muted); }
+.placement-size strong { display: block; margin-top: 3px; font: 600 14px/1.4 var(--mono); }
+.placement-gap-controls { display: flex; align-items: stretch; gap: 8px; }
+.placement-gap-controls input { min-width: 0; flex: 1; }
+.placement-gap-controls button { flex: none; }
+.placement .overlap { color: #823b12; font-weight: 600; }
+.placement details { margin-top: 13px; }
+.placement summary { width: fit-content; font-weight: 650; }
+.placement-table {
+  max-height: 15rem;
+  overflow: auto;
+  margin-top: 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.placement-table:focus-visible { outline: 2px solid #4f8066; outline-offset: 2px; }
+.placement-table table { width: 100%; border-spacing: 0; font: 12px/1.4 var(--mono); }
+.placement-table caption { text-align: left; padding: 6px 8px; color: var(--muted); }
+.placement-table th, .placement-table td { padding: 4px 6px; text-align: right; white-space: nowrap; }
+.placement-table thead th { position: sticky; top: 0; background: #e1e8d9; font-family: "Instrument Sans", sans-serif; }
+.placement-table th:first-child { text-align: left; }
+.placement-table tbody tr:nth-child(even) { background: #edf0e7; }
+.placement-table tbody tr[aria-current="true"] { color: #183d29; background: #d4e3ca; }
 </style></head>
 <body>
 <header class="mast">
@@ -59,11 +88,43 @@
         <div class="control-group"><label for="arrangement">Arrangement</label><select id="arrangement"><option value="grid">Rectangular grid</option><option value="hex">Hexagonal lattice</option><option value="circle">Circle</option><option value="spiral">Spiral</option><option value="custom" disabled>Custom layout</option></select>
           <div id="grid-inputs" class="field-pair"><label>Rows<input id="rows" type="number" min="1" max="32"></label><label>Columns<input id="cols" type="number" min="1" max="32"></label></div>
           <label id="count-field" class="subfield" hidden>Ring count<input id="count" type="number" min="1" max="400"></label>
-          <label for="spacing" class="subfield"><span id="spacing-label">Center spacing</span> <span class="unit">mm</span></label><div class="sliderline"><input id="spacing-range" aria-label="Layout spacing in millimeters" type="range" min="20" max="300" step="1"><input id="spacing" type="number" min="20" max="300" step="1"></div>
+          <label for="spacing" class="subfield"><span id="spacing-label">Center spacing</span> <span class="unit">mm</span></label><div class="sliderline"><input id="spacing-range" aria-label="Layout spacing in millimeters" type="range" min="20" max="300" step="1"><input id="spacing" type="number" min="0.001" max="100000" step="any"></div>
           <p class="help">The firmware grid corresponds to 60 mm here. Moving springs changes how long a wave takes to reach them.</p>
         </div>
+        <section class="control-group placement" aria-labelledby="placement-heading">
+          <h3 id="placement-heading">Placement plan</h3>
+          <div class="field-pair">
+            <label for="placement-diameter">Ring outer Ø · mm<input id="placement-diameter" type="number" min="1" max="1000" step="any" required value="38"></label>
+            <label for="placement-margin">Board margin · mm<input id="placement-margin" type="number" min="0" max="10000" step="any" required value="0"></label>
+          </div>
+          <div class="placement-size"><span>Board width × height</span><strong id="placement-size"></strong></div>
+          <p class="help">The board outline includes the clearance between the outer rings and each board edge.</p>
+          <p id="placement-gap" class="help"></p>
+          <label for="placement-target-gap" class="subfield">Set minimum edge gap · mm</label>
+          <div class="placement-gap-controls">
+            <input id="placement-target-gap" type="number" min="0" step="any" required placeholder="e.g. 5">
+            <button id="placement-apply-gap" type="button">Apply gap</button>
+          </div>
+          <p class="help">Applying a gap scales the layout about its center.</p>
+          <details id="placement-coordinates">
+            <summary>Ring center coordinates</summary>
+            <p id="placement-origin">Face the front of the board. Measure X right from the left edge and Y down from the top edge.</p>
+            <p id="placement-selected" class="mono"></p>
+            <div class="placement-table" tabindex="0" role="region" aria-label="Scrollable ring coordinates">
+              <table aria-describedby="placement-origin">
+                <caption>Ring centers in millimeters</caption>
+                <thead><tr><th scope="col">Ring</th><th scope="col">X from left</th><th scope="col">Y from top</th></tr></thead>
+                <tbody id="placement-rows"></tbody>
+              </table>
+            </div>
+          </details>
+          <div class="paired actions">
+            <button id="placement-csv" type="button">Coordinates CSV</button>
+            <button id="placement-svg" type="button">1:1 drawing SVG</button>
+          </div>
+        </section>
         <div class="control-group"><h3>Canvas tool</h3><div class="paired"><button id="move"><i data-icon="move"></i>Move</button><button id="add"><i data-icon="plus"></i>Add ring</button></div></div>
-        <div class="control-group last"><div class="group-title"><h3>Selected ring</h3><span id="layout-ring" class="mono"></span></div><div class="field-pair"><label>X · mm<input id="coord-x" type="number" step="1"></label><label>Y · mm<input id="coord-y" type="number" step="1"></label></div><div class="paired actions"><button id="remove"><i data-icon="minus"></i>Remove</button><button id="undo"><i data-icon="undo"></i>Undo layout</button></div></div>
+        <div class="control-group last"><div class="group-title"><h3>Selected ring</h3><span id="layout-ring" class="mono"></span></div><div class="field-pair"><label>Layout X · mm<input id="coord-x" type="number" step="any"></label><label>Layout Y · mm<input id="coord-y" type="number" step="any"></label></div><div class="paired actions"><button id="remove"><i data-icon="minus"></i>Remove</button><button id="undo"><i data-icon="undo"></i>Undo layout</button></div></div>
       </section>
       <section id="pane-lab" hidden>
         <div class="panel-title"><i data-icon="wave"></i><h2>Pattern lab</h2></div>
@@ -1181,6 +1242,8 @@
       this.selected = -1;
       this.hover = -1;
       this.tool = 'play';
+      this.placementRadius = radiusMM;
+      this.edgeMargin = 0;
       this.center = {x: 0, y: 0};
       this.zoomFactor = 1;
       this.scale = 1;
@@ -1241,10 +1304,27 @@
 
     setTool(tool) {
       if (!['play', 'move', 'add', 'pair'].includes(tool) || this.tool === tool) return;
+      const wasLayout = this.isLayout;
       this.resetInputs();
       this.tool = tool;
+      if (wasLayout !== this.isLayout) {
+        this.scale = this.fitScale() * this.zoomFactor;
+        this.staticDirty = true;
+      }
       this.setCursor();
       this.repaint();
+    }
+
+    get isLayout() { return this.tool === 'move' || this.tool === 'add'; }
+
+    get ringRadius() { return this.isLayout ? this.placementRadius : radiusMM; }
+
+    setPlacementDimensions(diameter, margin) {
+      const radius = diameter / 2;
+      if (this.placementRadius === radius && this.edgeMargin === margin) return;
+      this.placementRadius = radius;
+      this.edgeMargin = margin;
+      if (this.isLayout) this.fit();
     }
 
     setSelected(index) {
@@ -1259,8 +1339,9 @@
         left = Math.min(left, x); right = Math.max(right, x);
         top = Math.min(top, y); bottom = Math.max(bottom, y);
       }
+      const inset = this.ringRadius + (this.isLayout ? this.edgeMargin : 0);
       return {x: (left + right) / 2, y: (top + bottom) / 2,
-              w: right - left + radiusMM * 2, h: bottom - top + radiusMM * 2};
+              w: right - left + inset * 2, h: bottom - top + inset * 2};
     }
 
     fitScale(bounds = this.bounds()) {
@@ -1313,7 +1394,7 @@
     hit(point) {
       const s = this.screen(point);
       if (s.x < 0 || s.y < 0 || s.x > this.width || s.y > this.height) return -1;
-      let closest = -1, best = radiusMM ** 2;
+      let closest = -1, best = this.ringRadius ** 2;
       for (let i = 0; i < this.rings.length; i++) {
         const r = this.rings[i];
         const d = (r.x - point.x) ** 2 + (r.y - point.y) ** 2;
@@ -1492,7 +1573,7 @@
     reveal(index) {
       if (index < 0) return;
       const {x, y} = this.screen(this.rings[index]);
-      const margin = Math.min(radiusMM * this.scale + 5, this.width / 2, this.height / 2);
+      const margin = Math.min(this.ringRadius * this.scale + 5, this.width / 2, this.height / 2);
       const targetX = clamp(x, margin, this.width - margin);
       const targetY = clamp(y, margin, this.height - margin);
       if (targetX === x && targetY === y) return;
@@ -1549,7 +1630,8 @@
       const ctx = this.base.getContext('2d'), w = this.width, h = this.height;
       ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
-      const origin = this.screen({x: 0, y: 0});
+      const board = this.isLayout && this.rings.length ? this.bounds() : null;
+      const origin = this.screen(board ? {x: board.x - board.w / 2, y: board.y - board.h / 2} : {x: 0, y: 0});
       let grid = 25 * this.scale;
       while (grid < 15) grid *= 2;
       while (grid > 75) grid /= 2;
@@ -1567,7 +1649,24 @@
         }
       }
       ctx.stroke();
-      const radius = this.scale * radiusMM;
+      if (board) {
+        const boardWidth = board.w * this.scale, boardHeight = board.h * this.scale;
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#79a99c';
+        ctx.strokeRect(origin.x, origin.y, boardWidth, boardHeight);
+        const arm = Math.min(12, boardWidth / 2, boardHeight / 2);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#b4edda';
+        ctx.beginPath();
+        ctx.moveTo(origin.x + arm, origin.y);
+        ctx.lineTo(origin.x, origin.y);
+        ctx.lineTo(origin.x, origin.y + arm);
+        ctx.stroke();
+        ctx.fillStyle = '#b4edda';
+        ctx.font = '11px sans-serif';
+        ctx.fillText('0, 0', origin.x + 3, origin.y - 4);
+      }
+      const radius = this.scale * this.ringRadius;
       this.visible = [];
       for (let i = 0; i < this.rings.length; i++) {
         const {x, y} = this.screen(this.rings[i]);
@@ -1603,7 +1702,7 @@
       if (!this.width || !this.height) return;
       if ((window.devicePixelRatio || 1) !== this.dpr) { this.resize(); return; }
       if (this.staticDirty) this.paintBase();
-      const ctx = this.ctx, radius = radiusMM * this.scale, track = emitterRadiusMM * this.scale;
+      const ctx = this.ctx, radius = this.ringRadius * this.scale, track = radius * (emitterRadiusMM / radiusMM);
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       ctx.drawImage(this.base, 0, 0);
@@ -1708,6 +1807,10 @@ function runtimePattern(def) {
   return {...def,paint:c=>[compiled[0](c),compiled[1](c),compiled[2](c)]};
 }
 const MAX_RINGS=400, SHAPES=["grid","hex","circle","spiral","custom"];
+const MIN_SPACING_MM=0.001, MAX_SPACING_MM=100000;
+function validRingCenter(ring) {
+  return bounded(ring.x,-100000,100000) && bounded(ring.y,-100000,100000);
+}
 function geometry(shape,rows,cols,count,pitch){
   const rings=[];
   if(shape==="grid"||shape==="hex"){
@@ -1756,8 +1859,8 @@ function validatePattern(p){
 }
 function validateProject(p){
   if(!p||p.format!=="springtable-studio"||p.version!==1)throw Error("Choose a SpringTable Studio version 1 project.");
-  if(!SHAPES.includes(p.shape)||!bounded(p.rows,1,32,true)||!bounded(p.cols,1,32,true)||!bounded(p.count,1,MAX_RINGS,true)||!bounded(p.spacing,20,300)||!bounded(p.budget,.1,60)||!Array.isArray(p.rings)||p.rings.length<1||p.rings.length>MAX_RINGS)throw Error("The saved layout settings are outside the supported range.");
-  const rings=p.rings.map(r=>{if(!r||!bounded(r.x,-100000,100000)||!bounded(r.y,-100000,100000)||!bounded(r.row,0,100000,true)||!bounded(r.col,0,100000,true))throw Error("Invalid ring position.");return {x:r.x,y:r.y,row:r.row,col:r.col};});
+  if(!SHAPES.includes(p.shape)||!bounded(p.rows,1,32,true)||!bounded(p.cols,1,32,true)||!bounded(p.count,1,MAX_RINGS,true)||!bounded(p.spacing,MIN_SPACING_MM,MAX_SPACING_MM)||!bounded(p.budget,.1,60)||!Array.isArray(p.rings)||p.rings.length<1||p.rings.length>MAX_RINGS)throw Error("The saved layout settings are outside the supported range.");
+  const rings=p.rings.map(r=>{if(!r||!validRingCenter(r)||!bounded(r.row,0,100000,true)||!bounded(r.col,0,100000,true))throw Error("Invalid ring position.");return {x:r.x,y:r.y,row:r.row,col:r.col};});
   if(p.budget<minimumBudget(rings.length))throw Error("The budget must cover the idle current for all installed pixels.");
   if((p.shape==="grid"||p.shape==="hex")&&p.rows*p.cols!==rings.length)throw Error("Ring count does not match grid dimensions.");
   if(!Array.isArray(p.patterns)||p.patterns.length>100)throw Error("Invalid pattern collection.");
@@ -1765,6 +1868,13 @@ function validateProject(p){
   if(typeof p.mode!=="string"||!(/^(?:[0-9]|1[01])$/.test(p.mode)||(/^u\d+$/.test(p.mode)&&Number(p.mode.slice(1))<patterns.length)))throw Error("Unknown active pattern.");
   if(typeof p.name!=="string"||p.name.length>80)throw Error("Invalid project name.");
   const project={format:p.format,version:1,name:p.name,shape:p.shape,rows:p.rows,cols:p.cols,count:p.count,spacing:p.spacing,budget:p.budget,mode:p.mode,rings,patterns};
+  if(Object.hasOwn(p,"placement")){
+    const settings=p.placement;
+    if(!settings || !bounded(settings.diameter,1,1000) || !bounded(settings.margin,0,10000)){
+      throw Error("Check the mounting plan's ring diameter (1–1000 mm) and edge margin (0–10000 mm).");
+    }
+    project.placement={diameter:settings.diameter,margin:settings.margin};
+  }
   if(Object.hasOwn(p,"interferenceColors"))setProjectColors(project,p.interferenceColors);
   if(Object.hasOwn(p,"interferencePaletteMode")){
     if(p.interferencePaletteMode==="random")project.interferencePaletteMode="random";
@@ -1772,6 +1882,77 @@ function validateProject(p){
   }
   return project;
 }
+
+(() => {
+  'use strict';
+
+  function makePlan(rings, diameter, margin) {
+    if (!Array.isArray(rings) || rings.length === 0) throw new RangeError('A layout needs at least one ring.');
+    if (!Number.isFinite(diameter) || diameter <= 0) throw new RangeError('Enter a positive ring diameter.');
+    if (!Number.isFinite(margin) || margin < 0) throw new RangeError('Enter a nonnegative edge margin.');
+
+    let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
+    let nearestSquared = Infinity;
+    for (let i = 0; i < rings.length; i++) {
+      const {x, y} = rings[i];
+      if (!Number.isFinite(x) || !Number.isFinite(y)) throw new RangeError('Ring coordinates must be finite.');
+      left = Math.min(left, x);
+      right = Math.max(right, x);
+      top = Math.min(top, y);
+      bottom = Math.max(bottom, y);
+      for (let j = 0; j < i; j++) {
+        const dx = x - rings[j].x, dy = y - rings[j].y;
+        nearestSquared = Math.min(nearestSquared, dx * dx + dy * dy);
+      }
+    }
+
+    // Studio and the front of the board both use positive Y down.
+    const inset = diameter / 2 + margin;
+    const points = rings.map(({x, y}, index) => ({
+      id: index + 1,
+      x: (x - left) + inset,
+      y: (y - top) + inset
+    }));
+    return {
+      width: (right - left) + 2 * inset,
+      height: (bottom - top) + 2 * inset,
+      diameter,
+      margin,
+      points,
+      minDistance: points.length > 1 ? Math.sqrt(nearestSquared) : null
+    };
+  }
+
+  const mm = value => value.toFixed(3);
+
+  function csv(plan) {
+    const rows = plan.points.map(({id, x, y}) => [id, mm(x), mm(y)].join(','));
+    return ['ring,x_from_left_mm,y_from_top_mm', ...rows, ''].join('\r\n');
+  }
+
+  function svg(plan) {
+    const width = mm(plan.width), height = mm(plan.height);
+    const radius = plan.diameter / 2;
+    const tick = mm(Math.min(3, radius * 0.2));
+    const labelSize = mm(Math.min(5, radius * 0.38));
+    const labelY = mm(radius * 0.65);
+    const marks = plan.points.map(({id, x, y}) => (
+      `  <g id="ring-${id}" transform="translate(${mm(x)} ${mm(y)})">
+    <circle r="${mm(radius)}" fill="none" stroke="#424242" stroke-width="0.25"/>
+    <path d="M -${tick} 0 H ${tick} M 0 -${tick} V ${tick}" fill="none" stroke="#111" stroke-width="0.25"/>
+    <text x="0" y="${labelY}" font-family="sans-serif" font-size="${labelSize}" text-anchor="middle">${id}</text>
+  </g>`
+    ));
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}mm" height="${height}mm" viewBox="0 0 ${width} ${height}">
+  <title>SpringTable ring placement</title>
+  <desc>Front view in millimeters. Measure from the top-left corner, X to the right and Y down. Crosshairs mark ring centers. Circles show ring outer diameters.</desc>
+  <rect x="0" y="0" width="${width}" height="${height}" fill="none" stroke="#111" stroke-width="0.4"/>
+${marks.join('\n')}
+</svg>\n`;
+  }
+
+  window.SpringPlacement = {makePlan, csv, svg};
+})();
 
 (() => {
   "use strict";
@@ -1791,6 +1972,7 @@ function validateProject(p){
   let selected=0,pixel=0,tab="play",tool="move",custom=null,scene,sceneDirty=true;
   let simNow=0,prevReal=performance.now(),paused=false,demo=false,all=false,lastDemoBeat=-1,demoStart=0;
   let labIndex=-1,lastPaint=0,frameResult=null,saveTimer=0,noticeTimer=0,dragUndo=false;
+  let placementPlan=null, placementFrame=0, highlightedPlacementRow=null;
   let pairFirst=null; // null: normal input; -1: waiting for the first of two picks
   const contacts=new Map(),history=[];
   function notice(msg){$("message").textContent=msg;clearTimeout(noticeTimer);noticeTimer=setTimeout(()=>$("message").textContent="",6000);}
@@ -1901,12 +2083,85 @@ function validateProject(p){
     const r=project.rings[selected];if(!r)return;
     const name="Ring "+String(selected+1).padStart(2,"0");
     $("inspect-ring").textContent=name;$("layout-ring").textContent=name;
-    $("coord-x").value=+r.x.toFixed(2);$("coord-y").value=+r.y.toFixed(2);
+    $("coord-x").value=+r.x.toFixed(3);$("coord-y").value=+r.y.toFixed(3);
     $("remove").disabled=project.rings.length===1;
+    updatePlacementSelection();
+  }
+  function getPlacementPlan(){
+    if(!placementPlan){
+      const diameter = project.placement?.diameter ?? 38;
+      const margin = project.placement?.margin ?? 0;
+      placementPlan = SpringPlacement.makePlan(project.rings, diameter, margin);
+    }
+    return placementPlan;
+  }
+  function updatePlacementSelection(){
+    if(tab!=="layout" || !placementPlan || !$("placement-coordinates").open)return;
+    const point = placementPlan.points[selected];
+    $("placement-selected").textContent = `Selected ring ${point.id} · X ${point.x.toFixed(3)} / Y ${point.y.toFixed(3)} mm`;
+    highlightedPlacementRow?.removeAttribute("aria-current");
+    highlightedPlacementRow = $("placement-rows").rows[selected];
+    highlightedPlacementRow?.setAttribute("aria-current", "true");
+  }
+  function updatePlacementRows(points){
+    const body = $("placement-rows");
+    while(body.rows.length > points.length)body.deleteRow(-1);
+    for(const [index, point] of points.entries()){
+      let row = body.rows[index];
+      if(!row){
+        row = body.insertRow();
+        const header = document.createElement("th");
+        header.scope = "row";
+        header.textContent = point.id;
+        row.append(header);
+        row.insertCell();
+        row.insertCell();
+      }
+      const x = point.x.toFixed(3), y = point.y.toFixed(3);
+      if(row.cells[1].textContent!==x)row.cells[1].textContent = x;
+      if(row.cells[2].textContent!==y)row.cells[2].textContent = y;
+    }
+    updatePlacementSelection();
+  }
+  function renderPlacement(){
+    placementFrame = 0;
+    if(tab!=="layout")return;
+    const plan = getPlacementPlan();
+    for(const setting of ["diameter","margin"]){
+      const field = $("placement-" + setting);
+      if(field !== document.activeElement)field.value = plan[setting];
+    }
+    $("placement-size").textContent = `${plan.width.toFixed(3)} × ${plan.height.toFixed(3)} mm`;
+    const nearest = plan.minDistance;
+    const gap = nearest === null ? null : nearest - plan.diameter;
+    const overlap = gap !== null && gap < -1e-8;
+    const clearance = $("placement-gap");
+    clearance.classList.toggle("overlap", overlap);
+    if(nearest === null){
+      clearance.textContent = "Add a second ring to measure the gap.";
+    }else{
+      clearance.textContent = `Closest centers ${nearest.toFixed(3)} mm · ` +
+        (overlap ? `Ring outlines overlap by ${(-gap).toFixed(3)} mm.` : `Edge gap ${Math.max(0, gap).toFixed(3)} mm.`);
+      if(nearest===0)clearance.textContent += " Move rings with coincident centers apart to apply a gap.";
+    }
+    const canScale = nearest !== null && nearest > 0;
+    $("placement-apply-gap").disabled = !canScale;
+    $("placement-target-gap").disabled = !canScale;
+    if($("placement-coordinates").open)updatePlacementRows(plan.points);
+  }
+  function invalidatePlacement(){
+    placementPlan = null;
+    board.setPlacementDimensions(project.placement?.diameter ?? 38, project.placement?.margin ?? 0);
+    if(tab==="layout" && !placementFrame)placementFrame = requestAnimationFrame(renderPlacement);
   }
   function syncLayout(){
     $("arrangement").value=project.shape;$("rows").value=project.rows;$("cols").value=project.cols;
-    $("count").value=project.rings.length;$("spacing").value=project.spacing;$("spacing-range").value=project.spacing;
+    $("count").value=project.rings.length;
+    $("spacing").value=Number(project.spacing.toFixed(8));
+    const spacingRange=$("spacing-range");
+    spacingRange.min=Math.min(20,project.spacing);
+    spacingRange.max=Math.max(300,project.spacing);
+    spacingRange.value=project.spacing;
     $("spacing-label").textContent=["custom","spiral"].includes(project.shape)?"Layout spacing scale":"Center spacing";
     $("grid-inputs").hidden=!["grid","hex"].includes(project.shape);
     $("count-field").hidden=!["circle","spiral"].includes(project.shape);
@@ -1914,6 +2169,7 @@ function validateProject(p){
     $("project-label").value=project.name;
     $("budget").min=$("budget-range").min=minimumBudget(project.rings.length);$("budget").value=project.budget;$("budget-range").value=project.budget;
     $("pick-pair").disabled=project.rings.length<2;
+    invalidatePlacement();
     $("undo").disabled=!history.length;updateSelection();
   }
   function snapshot(){
@@ -1930,20 +2186,30 @@ function validateProject(p){
   }
   function regenerate(shape,rows,cols,count,spacing){
     if(!bounded(rows,1,32,true)||!bounded(cols,1,32,true)||!bounded(count,1,400,true)||(["grid","hex"].includes(shape)&&rows*cols>MAX_RINGS)){notice("Choose a layout with 1–400 rings, up to 32 rows or columns.");syncLayout();return;}
-    snapshot();Object.assign(project,{shape,rows,cols,spacing});
-    project.rings=geometry(shape,rows,cols,count,spacing);project.count=project.rings.length;
+    const rings=geometry(shape,rows,cols,count,spacing);
+    if(!rings.every(validRingCenter)){notice("Reduce the spacing or ring count to keep centers within ±100,000 mm.");syncLayout();return;}
+    snapshot();Object.assign(project,{shape,rows,cols,spacing,rings,count:rings.length});
     changedLayout();
   }
   function spacingChange(value,record=true){
-    if(!bounded(value,20,300)){notice("Spacing must be 20–300 mm.");syncLayout();return;}
-    if(value===project.spacing)return;
-    if(record)snapshot();
+    if(!bounded(value,MIN_SPACING_MM,MAX_SPACING_MM)){notice("Choose a spacing scale between 0.001 and 100,000 mm.");syncLayout();return false;}
+    if(value===project.spacing)return true;
     // Scale custom arrangements around their center so a previously translated board stays put.
     const ratio=value/project.spacing,rings=project.rings;
     const cx=rings.reduce((sum,r)=>sum+r.x,0)/rings.length,cy=rings.reduce((sum,r)=>sum+r.y,0)/rings.length;
     const positions=rings.map(r=>({...r,x:cx+(r.x-cx)*ratio,y:cy+(r.y-cy)*ratio}));
-    if(positions.some(r=>Math.abs(r.x)>100000||Math.abs(r.y)>100000)){notice("Spacing would exceed the coordinate range.");syncLayout();return;}
+    if(!positions.every(validRingCenter)){notice("Spacing would exceed the coordinate range.");syncLayout();return false;}
+    if(record)snapshot();
     project.rings=positions;project.spacing=value;changedLayout();
+    return true;
+  }
+  function applyMinimumGap(gap){
+    const plan=getPlacementPlan();
+    if(!Number.isFinite(gap) || gap<0 || !(plan.minDistance>0))return false;
+    const scale=project.spacing*((plan.diameter+gap)/plan.minDistance);
+    if(!spacingChange(scale))return false;
+    notice("Minimum edge gap set to "+gap+" mm.");
+    return true;
   }
   function moveRing(i,x,y,refit){
     if(!project.rings[i]||!bounded(x,-100000,100000)||!bounded(y,-100000,100000)){notice("Coordinates must be within ±100,000 mm.");syncLayout();return;}
@@ -1974,6 +2240,7 @@ function validateProject(p){
     tab=next;board.setTool(next==="layout"?tool:"play");
     document.querySelectorAll("[data-tab]").forEach(b=>{const yes=b.dataset.tab===next;b.classList.toggle("selected",yes);b.setAttribute("aria-pressed",yes);});
     ["play","layout","lab"].forEach(k=>$("pane-"+k).hidden=k!==next);updateActions();
+    if(next==="layout")renderPlacement();
   }
   function stopDemo(clear){if(!demo)return;demo=false;releaseSource("demo");if(clear)resetScene();updateActions();}
   function startDemo(){cancelPair();resetScene();demo=true;demoStart=simNow;lastDemoBeat=-1;paused=false;updateActions();}
@@ -2077,10 +2344,45 @@ function validateProject(p){
   $("arrangement").onchange=e=>regenerate(e.target.value,project.rows,project.cols,project.rings.length,project.spacing);
   for(const id of ["rows","cols","count"])$(id).onchange=()=>regenerate(project.shape,+$("rows").value,+$("cols").value,+$("count").value,project.spacing);
   $("spacing").onchange=e=>spacingChange(+e.target.value);
+  $("placement-coordinates").ontoggle = () => {
+    if($("placement-coordinates").open && tab==="layout")updatePlacementRows(getPlacementPlan().points);
+  };
+  for(const setting of ["diameter", "margin"]){
+    const field = $("placement-" + setting);
+    field.onchange = () => {
+      const plan = getPlacementPlan();
+      if(!field.validity.valid){
+        notice(`Enter a value between ${field.min} and ${field.max} mm. Restored ${plan[setting]} mm.`);
+        field.value = plan[setting];
+        return;
+      }
+      project.placement = {diameter:plan.diameter, margin:plan.margin, [setting]:field.valueAsNumber};
+      invalidatePlacement();
+      remember();
+    };
+  }
+  const targetGap = $("placement-target-gap");
+  $("placement-apply-gap").onclick = () => {
+    if(targetGap.reportValidity())applyMinimumGap(targetGap.valueAsNumber);
+  };
+  targetGap.onkeydown = event => {
+    if(event.key==="Enter"){
+      event.preventDefault();
+      $("placement-apply-gap").click();
+    }
+  };
+  $("placement-csv").onclick = () => downloadFile(SpringPlacement.csv(getPlacementPlan()), "text/csv;charset=utf-8", "-placement.csv");
+  $("placement-svg").onclick = () => downloadFile(SpringPlacement.svg(getPlacementPlan()), "image/svg+xml", "-placement.svg");
   let sliding=false;$("spacing-range").onpointerdown=()=>sliding=false;
   $("spacing-range").oninput=e=>{spacingChange(+e.target.value,!sliding);sliding=true;};$("spacing-range").onchange=()=>sliding=false;
   for(const id of ["move","add"])$(id).onclick=()=>{tool=id;board.setTool(tool);updateActions();};
-  for(const id of ["coord-x","coord-y"])$(id).onchange=()=>{snapshot();moveRing(selected,+$("coord-x").value,+$("coord-y").value,true);};
+  for(const axis of ["x","y"]){
+    $("coord-"+axis).onchange = event => {
+      const point = {...project.rings[selected], [axis]:event.target.valueAsNumber};
+      snapshot();
+      moveRing(selected, point.x, point.y, true);
+    };
+  }
   $("remove").onclick=()=>{if(project.rings.length<=1)return;snapshot();project.rings=project.rings.filter((_,i)=>i!==selected);project.count=project.rings.length;project.shape="custom";changedLayout();};
   $("undo").onclick=()=>{const prev=history.pop();if(prev){selected=prev.selected;delete prev.selected;Object.assign(project,prev);changedLayout();}};
   for(let p=0;p<16;p++){const b=document.createElement("button");b.setAttribute("aria-label","Inspect LED "+(p+1));b.onclick=()=>{pixel=p;if(frameResult)showPixels(frameResult);};$("pixel-strip").append(b);}
@@ -2110,14 +2412,18 @@ function validateProject(p){
     try{
       if(f.size>1024*1024)throw Error("Choose a project smaller than 1 MB.");
       const next=validateProject(JSON.parse(await f.text()));
-      stopDemo(false);all=false;contacts.clear();history.length=0;project=next;selected=0;labIndex=-1;paused=false;
+      stopDemo(false);all=false;contacts.clear();history.length=0;project=next;selected=0;labIndex=-1;paused=false;targetGap.value="";
       changedLayout();patternMenus();loadDraft(-1);switchTab("play");remember();notice("Opened "+f.name);
     }catch(error){notice("Open failed. "+error.message);}
   };
-  $("save").onclick=()=>{
-    const blob=new Blob([JSON.stringify(project,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob);
+  function downloadFile(content, type, suffix){
+    const url=URL.createObjectURL(new Blob([content],{type}));
     const stem=project.name.replace(/[^\w .-]/g,"").trim().slice(0,70)||"project";
-    const a=document.createElement("a");a.href=url;a.download="SpringTable-"+stem+".json";document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);flushSave();notice("Project exported.");
+    const a=document.createElement("a");a.href=url;a.download="SpringTable-"+stem+suffix;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);
+  }
+  $("save").onclick=()=>{
+    downloadFile(JSON.stringify(project,null,2), "application/json", ".json");
+    flushSave();notice("Project exported.");
   };
   board.setLayout(project.rings);board.setSelected(selected);syncLayout();patternMenus();loadDraft(-1);switchTab("play");
   if(!restored&&!matchMedia("(prefers-reduced-motion: reduce)").matches)startDemo();

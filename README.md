@@ -10,7 +10,7 @@ SpringTable is an interactive light installation made from metal doorstop spring
 
 Move the pointer across the virtual springs, tap them on a touchscreen, or focus the board and use the arrow keys and Enter. To try two springs with one mouse, choose **Reflected Interference** in the **Play** tab, click **Pick two springs**, then click two different rings. The second click launches both waves. Watch what happens when a returning wave crosses one still moving outward.
 
-Studio includes twelve patterns. **Ricochet** sends a colored ball bouncing between the edges. **Drain** pulls a trail into a tightening spiral and ends in a white flash. In **Layout**, arrange up to 400 rings in a grid, hexagonal lattice, circle or spiral, or place them individually. **Pattern lab** lets you design your own touch waves and per-pixel effects. Save a layout and its patterns together as a JSON project.
+Studio includes twelve patterns. **Ricochet** sends a colored ball bouncing between the edges. **Drain** pulls a trail into a tightening spiral and ends in a white flash. In **Layout**, arrange up to 400 rings, set the gap between them, and export numbered mounting coordinates or a full-size drawing. **Pattern lab** lets you design your own touch waves and per-pixel effects. Save a layout and its patterns together as a JSON project. [Plan a display board](docs/studio.md#lay-out-a-display-board)
 
 For offline use, download the repository ZIP, extract it, and open `SpringTable Studio.html`. The Studio guide includes example projects, the pattern catalog and the controls for experimenting with wave colors. [Download ZIP](https://github.com/biogoly/SpringTable/archive/refs/heads/master.zip) · [Studio guide](docs/studio.md)
 
