@@ -70,17 +70,102 @@ int main() {
     }
   }
 
+  // A lone live body still follows ballistic gravity and loses the specified
+  // energy at its first floor bounce, rather than using a cosmetic reversal.
+  static Field<10,10,fx::Color> isolated;
+  isolated.launch(0,4,0,white);
+  isolated.frame(100);
+  auto body = isolated.bodyAt(0);
+  assert(near(body.x,240) && near(body.y,9810*.1*.1/2,1e-7));
+  assert(near(body.vx,0) && near(body.vy,981,1e-7));
+  bool bounced = false;
+  for (unsigned ms=101; ms<500; ++ms) {
+    isolated.frame(ms); body=isolated.bodyAt(0);
+    if (body.vy < 0) {
+      const double reboundEnergy=557-body.y+body.vy*body.vy/(2*9810);
+      // Half-kick CCD approximates acceleration during the impact millisecond.
+      assert(near(reboundEnergy,557*.6084,557*.6084*.01));
+      bounced=true; break;
+    }
+  }
+  assert(bounced);
+
+  // Height remains meaningful after replacing the independent paths with a
+  // shared collision simulation: a low isolated drop dies much sooner.
+  static Field<10,10,fx::Color> highDrop,lowDrop;
+  highDrop.launch(0,0,0,white); lowDrop.launch(9,9,0,white);
+  unsigned highEnd=0,lowEnd=0;
+  for (unsigned ms=16;ms<=12000;ms+=16) {
+    highDrop.frame(ms); lowDrop.frame(ms);
+    if (!lowEnd && !lowDrop.activeCount()) lowEnd=ms;
+    if (!highEnd && !highDrop.activeCount()) highEnd=ms;
+  }
+  assert(lowEnd && highEnd>lowEnd+1000);
+
+  // An upper falling ball meets a lower rebounding ball. Equal-mass impulses
+  // conserve momentum while removing the restitution loss from normal energy.
+  static Field<10,10,fx::Color> meeting;
+  meeting.launch(0,4,0,white); meeting.launch(5,4,0,white);
+  bool exchanged=false;
+  for (unsigned ms=1;ms<800;++ms) {
+    meeting.frame(ms);
+    if (meeting.collisionCount()) {
+      assert(meeting.bodyAt(0).vy<0 && meeting.bodyAt(1).vy>0);
+      exchanged=true; break;
+    }
+  }
+  assert(exchanged);
+
+  // Deliberately high opposing speeds would cross completely within one tick
+  // without swept contact detection. Inject only initial state for this fixture.
+  using TestField = Field<10,10,fx::Color>;
+  static TestField fast;
+  fast.launch(3,2,0,white); fast.launch(3,7,0,white);
+  auto &fastA=const_cast<TestField::Ball&>(fast.bodyAt(0));
+  auto &fastB=const_cast<TestField::Ball&>(fast.bodyAt(1));
+  fastA.x=100; fastA.vx=200000; fastB.x=400; fastB.vx=-200000;
+  fast.frame(1);
+  assert(fast.collisionCount()==1 && fastA.x<fastB.x);
+  assert(near(fastA.vx,-180000,1e-6) && near(fastB.vx,180000,1e-6));
+  assert(near(fastA.vx+fastB.vx,0,1e-6));
+
+  // Coincident plucks separate deterministically. A third ball then meets the
+  // pair off-center and creates opposite sideways motion without a random kick.
+  static Field<10,10,fx::Color> glancing;
+  glancing.launch(0,4,0,white); glancing.launch(0,4,0,white);
+  glancing.launch(4,4,0,white);
+  bool sideways=false;
+  for (unsigned ms=1;ms<1500;++ms) {
+    glancing.frame(ms);
+    for (unsigned i=0;i<glancing.activeCount();++i) {
+      const auto s=glancing.bodyAt(i);
+      assert(std::isfinite(s.x) && std::isfinite(s.y) && std::isfinite(s.vx) && std::isfinite(s.vy));
+      assert(s.x>=-17.00001 && s.x<=557.00001 && s.y<=557.00001);
+      if (std::abs(s.vx)>10) sideways=true;
+    }
+  }
+  assert(sideways && glancing.collisionCount()>0);
+
+  // A degenerate dense pile must not damp an unrelated falling ball.
+  static TestField pile,apart;
+  pile.launch(0,9,0,white); apart.launch(0,9,0,white);
+  for(unsigned i=0;i<127;++i) pile.launch(9,0,0,white);
+  pile.frame(100); apart.frame(100);
+  assert(near(pile.bodyAt(0).x,apart.bodyAt(0).x));
+  assert(near(pile.bodyAt(0).y,apart.bodyAt(0).y));
+  assert(near(pile.bodyAt(0).vy,apart.bodyAt(0).vy));
+
   using Table = fx::Scene<10,10>;
-  Table frequent, skipped;
+  static Table frequent, skipped;
   for (Table *s : {&frequent,&skipped}) {
-    s->setMode(fx::BouncyBall); s->setBouncyBallSeed(1234); s->press(0,4,100);
+    s->setMode(fx::BouncyBall); s->setBouncyBallSeed(1234); s->press(0,4,100); s->press(5,4,100);
   }
   assert(energy(snapshot(frequent,100)) > 0);
   for (unsigned t=101; t<2023; t+=7) snapshot(frequent,t);
   assert(snapshot(frequent,2023) == snapshot(skipped,2023));
   assert(energy(snapshot(skipped,100000)) == 0); // held does not auto-repeat
 
-  Table held, repeated;
+  static Table held, repeated;
   for (Table *s : {&held,&repeated}) {
     s->setMode(fx::BouncyBall); s->setBouncyBallSeed(0); s->press(0,1,100);
   }
@@ -90,7 +175,6 @@ int main() {
   repeated.press(0,1,300);
   const auto one = snapshot(held,300), two = snapshot(repeated,300);
   assert(energy(two) > energy(one));
-  for (unsigned i=0;i<one.size();++i) assert(two[i]>=one[i]);
   repeated.setMode(fx::Solid); repeated.setMode(fx::BouncyBall);
   assert(energy(snapshot(repeated,301)) == 0);
   repeated.press(0,1,302); assert(energy(snapshot(repeated,302)) == 0);
@@ -98,27 +182,26 @@ int main() {
   assert(energy(snapshot(repeated,303)) > 0);
 
   // Absolute ages produce identical frames through the uint32 millisecond wrap.
-  Table wrapped, ordinary;
+  static Table wrapped, ordinary;
   const uint32_t base = UINT32_MAX-150u;
   for (Table *s : {&wrapped,&ordinary}) { s->setMode(fx::BouncyBall); s->setBouncyBallSeed(98765); }
   wrapped.press(0,5,base); ordinary.press(0,5,0);
+  wrapped.press(5,5,base); ordinary.press(5,5,0);
   for (uint32_t age : {0u,149u,151u,343u,1000u,2000u,4000u})
     assert(snapshot(wrapped,base+age) == snapshot(ordinary,age));
 
-  // An expired short drop must be removed before capacity eviction: the older
-  // high drop on the right should remain when a new low ball is added on left.
-  Field<10,10,fx::Color> field;
+  // Capacity, coincident launches, finite state, and a very long delayed frame
+  // must remain bounded. No active object survives the conservative age guard.
+  static Field<10,10,fx::Color> field;
   field.launch(0,9,0,white);
   for (unsigned i=1;i<128;++i) field.launch(9,0,0,white);
   assert(field.activeCount() == 128);
-  const auto afterLow = uint32_t(std::ceil(low.lifeSeconds*1000));
-  assert(afterLow/1000.0 < high.lifeSeconds);
-  field.launch(9,0,afterLow,white);
-  assert(field.activeCount() == 2);
-  field.frame(afterLow);
-  unsigned rightEnergy=0;
-  for (unsigned r=0;r<10;++r) for (unsigned p=0;p<16;++p) rightEnergy += field.pixel(r,9,p).r;
-  assert(rightEnergy>0);
+  field.frame(50);
+  for (unsigned i=0;i<field.activeCount();++i) {
+    const auto s=field.bodyAt(i);
+    assert(std::isfinite(s.x) && std::isfinite(s.y) && std::isfinite(s.vx) && std::isfinite(s.vy));
+  }
+  field.frame(100000); assert(field.activeCount()==0);
   field.clear(); field.launch(0,9,0,white);
   for (unsigned i=1;i<128;++i) field.launch(0,0,0,white);
   field.launch(0,0,0,white); // all alive; oldest insertion is evicted, including ties
@@ -128,7 +211,7 @@ int main() {
   field.frame(100000); assert(field.activeCount()==0);
 
   // Real bouncy-ball output passes through the same total-current limiter.
-  Table crowded;
+  static Table crowded;
   crowded.setMode(fx::BouncyBall);
   for (unsigned r=0;r<10;++r) for (unsigned c=0;c<10;++c) crowded.press(r,c,0);
   const auto bright = snapshot(crowded,0);
@@ -140,5 +223,5 @@ int main() {
   for (unsigned i=0;i<bright.size();i+=3)
     limited+=powerlimit::demand(gain.apply(bright[i]),gain.apply(bright[i+1]),gain.apply(bright[i+2]));
   assert(powerlimit::estimatedMicroAmps(limited,1600)<=5000000);
-  std::printf("Bouncy Ball physics, energy, lifetime, cadence, press edges, wrap, expiry, capacity, current limit. Scene bytes: %zu.\n",sizeof(Table));
+  std::printf("Bouncy Ball gravity, collision impulse, glancing deflection, lifetime, cadence, press edges, wrap, capacity and current limit. Scene bytes: %zu.\n",sizeof(Table));
 }

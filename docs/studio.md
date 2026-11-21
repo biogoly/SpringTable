@@ -20,15 +20,17 @@ Choose a pattern by name in **Play → Pattern**. The mode numbers are for the T
 | 9 | Reflection | Sends a ripple to the edges, where a paler echo races back to the spring. |
 | 10 | Interference | Sends a train of ripples. Two crests reinforce each other, and equal crests and troughs cancel to black. |
 | 11 | Reflected Interference | Reflects each wave at the edge. Returning ripples can reinforce or cancel waves still traveling outward. |
-| 12 | Bouncy Ball | Drops a randomly colored ball from rest. Gravity accelerates the fall, and each rebound loses energy until the ball settles and fades. |
+| 12 | Bouncy Ball | Drops a randomly colored ball. Balls exchange momentum on contact, rebound from the bottom and sides, and settle and fade as they lose energy. |
 
 ### Drop a bouncing ball
 
-Choose **Bouncy Ball** and pluck a spring near the top of the layout, then try one near the bottom. Balls fall straight down to a flat floor at the lowest LEDs. A higher release means greater impact speed, a higher rebound, and a longer lifetime. Each ball has its own color and clock. Holding a spring launches once, and releasing and touching again adds another ball. Up to 128 balls can overlap.
+Choose **Bouncy Ball** and pluck a spring near the top of the layout, then try one near the bottom. Each ball starts at rest and falls to a flat floor at the lowest LEDs. A higher release means greater impact speed, a higher rebound, and a longer lifetime. When balls meet they exchange momentum: direct hits can send another ball upward, while glancing hits send them sideways. They also rebound from the left and right edges. Each ball keeps its own color. Holding a spring launches once, and releasing and touching again adds another ball. Up to 128 balls can be active.
 
-The simulation uses 9.81 m/s² gravity and retains 78% of vertical speed at each impact, making each rebound about 61% as high as the last. Once the next bounce would rise less than 0.5 mm, the ball settles and fades over 400 ms. On sparse layouts, the nearest LEDs show its position across gaps. **Pause** and **+16 ms** let you inspect the motion. On the Teensy, use `mode 12`.
+Try two springs in the same column at different heights to make a falling ball meet a rising one. On a spiral, or with slightly offset columns, glancing contacts produce sideways motion. The simulation uses 9.81 m/s² gravity, 78% rebound speed at the floor and sides, and 90% restitution between equal-mass balls. Floor friction slows sideways motion. After remaining nearly still for 120 ms, a ball fades over 400 ms; a strong hit can wake it before it disappears. Repeated collisions can prolong its motion, with a height-scaled maximum lifetime to retire old balls in continually replenished piles.
 
-![Randomly colored balls falling and bouncing at different heights on the grid](../Bouncy-Ball-preview.gif)
+Motion advances in fixed 1 ms steps with swept collision detection. **Pause** and **+16 ms** let you inspect a contact, and changing the rendering frame rate does not change the result. On sparse layouts, the nearest LEDs show each ball's position across gaps. On the Teensy, use `mode 12`.
+
+![Randomly colored balls colliding and bouncing across LED rings](../Bouncy-Ball-preview.gif)
 
 ### Pluck a pair
 

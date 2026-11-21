@@ -8,7 +8,7 @@
   const descriptions=["A colored wave spreads from each spring to its neighbors.","A comet circles the touched ring and fades after release.","Touched rings hold their color, then fade out.","Color sparks scatter around each touched ring.","Three bright teeth rotate around the touched ring.","Amber embers flicker across the touched ring.","A square wave expands around each touch.","Each pluck launches a colored ball. It rebounds off the outer edge, leaves a short trail, and fades. Brush several springs to fill the table.","A colored trail spirals inward from each pluck. It spins faster as it tightens, flashes white at the center, then fades to black.","A ripple spreads to the outer edges. A paler echo races back to the spring you touched."];
   descriptions.push("Each spring sends a train of ripples. Crests and troughs take the two palette colors. Equal, opposite waves cancel to black.");
   descriptions.push("Each ripple bounces once at the edge. Returning crests strengthen outgoing crests and cancel equal troughs. Pick two springs to launch both together.");
-  descriptions.push("Each pluck drops a randomly colored ball under gravity. Higher drops bounce higher and last longer. Each bounce loses energy until the ball settles and fades.");
+  descriptions.push("Each pluck drops a randomly colored ball under gravity. Balls collide, knock each other sideways, and rebound from the bottom and sides. Higher drops bounce higher; motion loses energy until the balls settle and fade.");
   const usesPairedWaves = mode => mode==="10" || mode==="11";
   const shapeNames={grid:"Grid",hex:"Hex lattice",circle:"Circle",spiral:"Spiral",custom:"Custom"};
   const key="springtable-studio-project-v1";
@@ -292,7 +292,7 @@
   function tickDemo(){
     const pairDemo=usesPairedWaves(project.mode);
     const ballDemo=project.mode==="12";
-    const beatMs=pairDemo?3400:ballDemo?900:230;
+    const beatMs=pairDemo?3400:ballDemo?450:230;
     const elapsed=simNow-demoStart,beat=Math.floor(elapsed/beatMs);
     if(beat!==lastDemoBeat){
       releaseSource("demo");lastDemoBeat=beat;
@@ -303,7 +303,7 @@
       const hit=(fx,fy,except=-1)=>{const x=minX+fx*(maxX-minX),y=minY+fy*(maxY-minY);let id=-1,best=Infinity;
         rings.forEach((r,i)=>{const d=(r.x-x)**2+(r.y-y)**2;if(i!==except&&d<best){best=d;id=i;}});if(id>=0)setContact(id,"demo",true);return id;};
       if(ballDemo){
-        if(cycle<8)hit(.2+(cycle%4)*.2, cycle%2 ? .65 : .08);
+        if(cycle<8)hit(.2+(Math.floor(cycle/2)%4)*.2, cycle%2 ? .65 : .08);
       }else if(pairDemo){
         scene.beginInterferenceGroup();
         const horizontal=maxX-minX>=maxY-minY;
