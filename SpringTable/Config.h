@@ -40,7 +40,7 @@ static_assert(Rows <= sizeof(LedPins) && Cols <= 12, "Check LED lanes and MPR121
 static_assert(uint64_t(PixelBudgetMilliAmps) * 1000 >= uint64_t(TotalPixels) * IdleMicroAmpsPerPixel,
               "Pixel budget must cover the idle draw of every powered pixel");
 static_assert(TouchThreshold > ReleaseThreshold && ReleaseThreshold > 0, "Check touch hysteresis");
-static_assert(BootMode <= 11, "Unknown effect");
+static_assert(BootMode <= 12, "Unknown effect");
 
 inline uint8_t muxChannel(unsigned row) {
   return (SPRINGTABLE_FULL || SPRINGTABLE_BENCH_MUX) ? static_cast<uint8_t>(row / 2) : 0xFF;

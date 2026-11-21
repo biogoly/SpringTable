@@ -150,5 +150,6 @@
       return active;
     }
   }
+  window.SpringEmitters = Emitters;
   window.SpringDrain = Drain;
 })();

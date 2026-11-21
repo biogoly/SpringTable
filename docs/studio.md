@@ -20,6 +20,15 @@ Choose a pattern by name in **Play → Pattern**. The mode numbers are for the T
 | 9 | Reflection | Sends a ripple to the edges, where a paler echo races back to the spring. |
 | 10 | Interference | Sends a train of ripples. Two crests reinforce each other, and equal crests and troughs cancel to black. |
 | 11 | Reflected Interference | Reflects each wave at the edge. Returning ripples can reinforce or cancel waves still traveling outward. |
+| 12 | Bouncy Ball | Drops a randomly colored ball from rest. Gravity accelerates the fall, and each rebound loses energy until the ball settles and fades. |
+
+### Drop a bouncing ball
+
+Choose **Bouncy Ball** and pluck a spring near the top of the layout, then try one near the bottom. Balls fall straight down to a flat floor at the lowest LEDs. A higher release means greater impact speed, a higher rebound, and a longer lifetime. Each ball has its own color and clock. Holding a spring launches once, and releasing and touching again adds another ball. Up to 128 balls can overlap.
+
+The simulation uses 9.81 m/s² gravity and retains 78% of vertical speed at each impact, making each rebound about 61% as high as the last. Once the next bounce would rise less than 0.5 mm, the ball settles and fades over 400 ms. On sparse layouts, the nearest LEDs show its position across gaps. **Pause** and **+16 ms** let you inspect the motion. On the Teensy, use `mode 12`.
+
+![Randomly colored balls falling and bouncing at different heights on the grid](../Bouncy-Ball-preview.gif)
 
 ### Pluck a pair
 
@@ -60,7 +69,7 @@ Select **Apply & test pattern** and hold a spring. The dot moves 12 LED position
 
 The repository includes 100-ring spiral projects. Download an example from GitHub using **Download raw file**, then choose it with **Open** in Studio.
 
-- Follow a bouncing ball or an inward spiral. [Ricochet](../Ricochet%20Spiral.json) · [Drain](../Drain%20Spiral.json)
+- Drop a ball under gravity, bounce between the edges, or follow an inward spiral. [Bouncy Ball](../Bouncy%20Ball%20Spiral.json) · [Ricochet](../Ricochet%20Spiral.json) · [Drain](../Drain%20Spiral.json)
 - Compare a returning echo, two interfering waves, and both effects together. [Reflection](../Reflection%20Spiral.json) · [Interference](../Interference%20Spiral.json) · [Reflected Interference](../Reflected%20Interference%20Spiral.json)
 - Try fixed colors or draw a new pair on every launch. [Amber and Blue](../Amber%20and%20Blue%20Spiral.json) · [Random Palette](../Random%20Palette%20Spiral.json)
 

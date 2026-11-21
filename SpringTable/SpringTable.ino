@@ -35,6 +35,7 @@ int diagnosticMin = 1024, diagnosticMax = -1024;
 bool logEdges = false;
 unsigned currentMode = cfg::BootMode;
 bool ricochetSeeded = false;
+bool bouncyBallSeeded = false;
 bool interferencePaletteSeeded = false;
 uint32_t lastPoll = 0, lastFrame = 0, lastDiagnostic = 0;
 uint32_t requestedUA = powerlimit::estimatedMicroAmps(0, cfg::TotalPixels);
@@ -94,6 +95,10 @@ void pollRow(unsigned row, uint32_t now) {
       if (currentMode == fx::Ricochet && !ricochetSeeded) {
         scene.setRicochetSeed(now * UINT32_C(0x9e3779b9) ^ (row * cfg::Cols + col + 1));
         ricochetSeeded = true;
+      }
+      if (currentMode == fx::BouncyBall && !bouncyBallSeeded) {
+        scene.setBouncyBallSeed(now * UINT32_C(0x9e3779b9) ^ (row * cfg::Cols + col + 1));
+        bouncyBallSeeded = true;
       }
       if (!interferencePaletteSeeded && scene.getInterferenceRandom() &&
           (currentMode == fx::Interference || currentMode == fx::ReflectedInterference)) {
@@ -220,7 +225,7 @@ void showStatus() {
 
 void showHelp() {
   Serial.println("status | events | diag ROW COL | diag off | loc ROW COL [r/g/b/w] | dark | play | mode N | palette | palette RRGGBB RRGGBB | palette random | palette fixed | palette reset | help");
-  Serial.println("0 Ripple, 1 Spinner, 2 Solid, 3 Confetti, 4 Three-dot gear, 5 Fire, 6 Surface, 7 Ricochet, 8 Drain, 9 Reflection, 10 Interference, 11 Reflected Interference");
+  Serial.println("0 Ripple, 1 Spinner, 2 Solid, 3 Confetti, 4 Three-dot gear, 5 Fire, 6 Surface, 7 Ricochet, 8 Drain, 9 Reflection, 10 Interference, 11 Reflected Interference, 12 Bouncy Ball");
 }
 
 void handleCommand(const char *line) {
@@ -239,7 +244,7 @@ void handleCommand(const char *line) {
   } else if (!strcmp(line, "dark") || !strcmp(line, "play")) {
     display = !strcmp(line, "play") ? Display::Play : Display::Dark;
     Serial.println(line);
-  } else if (sscanf(line, "mode %d %c", &mode, &extra) == 1 && mode >= 0 && mode <= fx::ReflectedInterference) {
+  } else if (sscanf(line, "mode %d %c", &mode, &extra) == 1 && mode >= 0 && mode <= fx::BouncyBall) {
     currentMode = unsigned(mode);
     scene.setMode(currentMode);
     display = Display::Play;

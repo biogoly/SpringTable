@@ -78,7 +78,7 @@ Send one command per line. Rows and columns start at zero. For pattern names and
 | `diag ROW COL` / `diag off` | Stream readings for one electrode / stop the stream. |
 | `loc ROW COL [r/g/b/w]` | Identify a ring with color segments or fill it with one calibration color. |
 | `dark` / `play` | Blank LEDs while touch scanning continues / resume animation. |
-| `mode N` | Select a built-in pattern (0–11). Set `BootMode` for the startup selection. |
+| `mode N` | Select a built-in pattern (0–12). Set `BootMode` for the startup selection. |
 | `palette` / `palette RRGGBB RRGGBB` | Show the interference palette / set crest and trough colors in hex. |
 | `palette random` / `palette fixed` / `palette reset` | Choose fresh colors for each pluck group / recall the manual pair / restore configured defaults. |
 

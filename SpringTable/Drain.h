@@ -13,9 +13,7 @@ class Field {
     Color color;
     bool active;
   };
-  struct Spot {
-    double x, y, nearest2, lightRadius2;
-  };
+  using Spot = ringgeom::GridSpot<Rows, Cols>;
   struct CentralRing {
     unsigned firstPixel;
     double weights[16];
@@ -30,30 +28,12 @@ class Field {
   CentralRing flash_[4] = {};
   unsigned next_ = 0, flashCount_ = 0;
 
-  static int nearestIndex(double position, unsigned count) {
-    int index = static_cast<int>(floor(position / 60 + 0.5));
-    if (index < 0) return 0;
-    return index < static_cast<int>(count) ? index : static_cast<int>(count) - 1;
-  }
-
   static Spot spot(double x, double y, double lightRadius) {
-    // All emitters of one angular index form a 60 mm grid. Subtract its
-    // offset and round to find its closest emitter in O(1) per index.
-    double nearest2 = 0;
-    for (unsigned p = 0; p < 16; ++p) {
-      const double ox = ringgeom::xOffset(p), oy = ringgeom::yOffset(p);
-      const int c = nearestIndex(x - ox, Cols), r = nearestIndex(y - oy, Rows);
-      const double dx = c * 60 + ox - x, dy = r * 60 + oy - y;
-      const double d2 = dx * dx + dy * dy;
-      if (p == 0 || d2 < nearest2) nearest2 = d2;
-    }
-    return {x, y, nearest2, lightRadius * lightRadius};
+    return Spot::at(x, y, lightRadius);
   }
 
   static double weight(const Spot &s, double x, double y) {
-    const double dx = x - s.x, dy = y - s.y;
-    const double value = 1 - (dx * dx + dy * dy - s.nearest2) / s.lightRadius2;
-    return value <= 0 ? 0 : (value >= 1 ? 1 : value);
+    return s.weight(x, y);
   }
 
   static uint8_t sum(uint8_t old, unsigned increment) {

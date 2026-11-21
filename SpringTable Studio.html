@@ -513,7 +513,124 @@
       return active;
     }
   }
+  window.SpringEmitters = Emitters;
   window.SpringDrain = Drain;
+})();
+
+(() => {
+  'use strict';
+
+  const GRAVITY = 9810, RESTITUTION = 0.78, MIN_APEX = 0.5, FADE_SECONDS = 0.4;
+  const MAX_BALLS = 128, LIGHT_RADIUS = 24;
+  const TAP_DELAYS = [0, 18, 36], TAP_WEIGHTS = [1, 0.35, 0.12];
+
+  function trajectory(height) {
+    const firstImpactSeconds = Math.sqrt(2 * height / GRAVITY);
+    let settleSeconds = firstImpactSeconds, bounceCount = 0;
+    let speed = GRAVITY * firstImpactSeconds * RESTITUTION;
+    while (speed * speed / (2 * GRAVITY) >= MIN_APEX) {
+      settleSeconds += 2 * speed / GRAVITY;
+      bounceCount++;
+      speed *= RESTITUTION;
+    }
+    return {height, firstImpactSeconds, settleSeconds,
+      lifeSeconds: settleSeconds + FADE_SECONDS, bounceCount};
+  }
+
+  // Every frame evaluates the same ballistic path directly from its age.
+  // Pausing or skipping a frame cannot alter a rebound's height or timing.
+  function sample(path, seconds) {
+    const age = Math.max(0, seconds);
+    if (age < path.firstImpactSeconds) {
+      return {height: Math.max(0, path.height - 0.5 * GRAVITY * age * age),
+        velocity: GRAVITY * age, brightness: 1, bounce: 0, settled: false};
+    }
+    if (age >= path.settleSeconds) {
+      return {height: 0, velocity: 0,
+        brightness: Math.pow(RESTITUTION, path.bounceCount / 2) *
+          Math.max(0, Math.min(1, (path.lifeSeconds - age) / FADE_SECONDS)),
+        bounce: path.bounceCount, settled: true};
+    }
+    let remaining = age - path.firstImpactSeconds;
+    let speed = GRAVITY * path.firstImpactSeconds * RESTITUTION;
+    for (let bounce = 1; bounce <= path.bounceCount; bounce++) {
+      const duration = 2 * speed / GRAVITY;
+      if (remaining < duration || bounce === path.bounceCount) {
+        return {height: Math.max(0, speed * remaining - 0.5 * GRAVITY * remaining * remaining),
+          velocity: GRAVITY * remaining - speed,
+          brightness: Math.pow(RESTITUTION, bounce / 2), bounce, settled: false};
+      }
+      remaining -= duration;
+      speed *= RESTITUTION;
+    }
+  }
+
+  class BouncyBall {
+    constructor(rings, palette, seed) {
+      this.floor = rings.length ? Math.max(...rings.map(ring => ring.y)) + 17 : 0;
+      this.palette = palette;
+      this.balls = [];
+      this.emitters = new window.SpringEmitters(rings);
+      this.peaks = new Float64Array(rings.length * 16);
+      this.indices = new Uint32Array(this.peaks.length);
+      this.setSeed(seed);
+    }
+
+    setSeed(seed) { this.seed = (seed >>> 0) || 0x6d2b79f5; }
+
+    next() {
+      this.seed ^= this.seed << 13;
+      this.seed ^= this.seed >>> 17;
+      this.seed ^= this.seed << 5;
+      this.seed >>>= 0;
+      return this.seed;
+    }
+
+    launch(origin, now) {
+      if (!this.peaks.length) return;
+      // Low drops can finish before older high drops. Reclaim expired entries
+      // before evicting the oldest surviving ball at the capacity limit.
+      this.balls = this.balls.filter(ball => ((now - ball.born) >>> 0) / 1000 < ball.trajectory.lifeSeconds);
+      if (this.balls.length === MAX_BALLS) this.balls.shift();
+      this.balls.push({born: now >>> 0, x: origin.x,
+        color: this.palette[this.next() % this.palette.length],
+        trajectory: trajectory(Math.max(0, this.floor - origin.y))});
+    }
+
+    render(now, pixels) {
+      let active = 0;
+      for (const ball of this.balls) {
+        const age = (now - ball.born) >>> 0;
+        if (age / 1000 >= ball.trajectory.lifeSeconds) continue;
+        this.balls[active++] = ball;
+        const current = sample(ball.trajectory, age / 1000);
+        let count = 0;
+        for (let tap = 0; tap < TAP_DELAYS.length && age >= TAP_DELAYS[tap]; tap++) {
+          const past = sample(ball.trajectory, (age - TAP_DELAYS[tap]) / 1000);
+          this.emitters.spot(ball.x, this.floor - past.height, LIGHT_RADIUS, (index, base) => {
+            const strength = base * TAP_WEIGHTS[tap];
+            if (strength <= this.peaks[index]) return;
+            if (!this.peaks[index]) this.indices[count++] = index;
+            this.peaks[index] = strength;
+          });
+        }
+        for (let j = 0; j < count; j++) {
+          const index = this.indices[j], strength = this.peaks[index] * current.brightness;
+          this.peaks[index] = 0;
+          for (let channel = 0; channel < 3; channel++) {
+            const offset = index * 3 + channel;
+            pixels[offset] = Math.min(255, pixels[offset] + Math.round(ball.color[channel] * strength));
+          }
+        }
+      }
+      this.balls.length = active;
+      return active;
+    }
+  }
+
+  BouncyBall.trajectory = trajectory;
+  BouncyBall.sample = sample;
+  window.SpringBouncyBall = BouncyBall;
 })();
 
 (() => {
@@ -979,6 +1096,7 @@
       this.heldCount = 0;
       this.mode = 0;
       this.ricochet = null;
+      this.bouncyBall = null;
       this.drain = null;
       this.reflection = null;
       this.interference = null;
@@ -986,6 +1104,7 @@
       this.interferenceColors = undefined;
       this.interferencePalette = null;
       this.ricochetSeed = calibration.ricochetSeed;
+      this.bouncyBallSeed = calibration.bouncyBallSeed;
       // Geometry is fixed for the life of a Scene. Coordinates and distances are mm.
       // Cache both metrics once so simultaneous plucks only evaluate the envelopes.
       this.distances = this.rings.map(source => {
@@ -1000,9 +1119,10 @@
     }
 
     setMode(mode) {
-      if (!Number.isInteger(mode) || mode < 0 || mode > 11 || this.mode === mode) return;
+      if (!Number.isInteger(mode) || mode < 0 || mode > 12 || this.mode === mode) return;
       if (this.interferencePalette) this.interferencePalette.group = null;
       if (this.ricochet && (this.mode === 7 || mode === 7)) this.ricochet.balls.length = 0;
+      if (this.bouncyBall && (this.mode === 12 || mode === 12)) this.bouncyBall.balls.length = 0;
       if (this.drain && (this.mode === 8 || mode === 8)) this.drain.orbits.length = 0;
       if (this.reflection && (this.mode === 9 || mode === 9)) this.reflection.waves.length = 0;
       if (this.interference && (this.mode === 10 || mode === 10)) this.interference.waves.length = 0;
@@ -1021,12 +1141,25 @@
         }
         this.ricochet = new window.SpringRicochet(this.rings, PALETTE, seed);
       }
+      if (mode === 12 && !this.bouncyBall) {
+        let seed = this.bouncyBallSeed;
+        if (seed === undefined) {
+          seed = globalThis.crypto?.getRandomValues(new Uint32Array(1))[0] ??
+                 Math.floor(Math.random() * 0x100000000);
+        }
+        this.bouncyBall = new window.SpringBouncyBall(this.rings, PALETTE, seed);
+      }
       this.mode = mode;
     }
 
     setRicochetSeed(seed) {
       this.ricochetSeed = seed >>> 0;
       this.ricochet?.setSeed(this.ricochetSeed);
+    }
+
+    setBouncyBallSeed(seed) {
+      this.bouncyBallSeed = seed >>> 0;
+      this.bouncyBall?.setSeed(this.bouncyBallSeed);
     }
 
     setInterferenceColors(crest, trough) {
@@ -1073,6 +1206,7 @@
       if (!touch) return;
       if (this.mode >= 7 && touch.held) return;
       if (this.mode === 7) this.ricochet.launch(this.rings[index], now);
+      if (this.mode === 12) this.bouncyBall.launch(this.rings[index], now);
       touch.color = PALETTE[this.colorIndex % PALETTE.length];
       if (this.mode === 8) this.drain.launch(this.rings[index], touch.color, now);
       if (this.mode === 9) this.reflection.launch(index, touch.color, now);
@@ -1166,6 +1300,7 @@
       }
       const custom = customDefinition && !formula ? customWave(customDefinition) : null;
       const ricochet = !customDefinition && this.mode === 7;
+      const bouncyBall = !customDefinition && this.mode === 12;
       const drain = !customDefinition && this.mode === 8;
       const reflection = !customDefinition && this.mode === 9;
       const interference = !customDefinition && (this.mode === 10 ? this.interference :
@@ -1193,13 +1328,15 @@
         const color = colors.subarray(i * 3, i * 3 + 3);
         for (let p = 0; p < PIXELS; ++p) pixels.set(color, (i * PIXELS + p) * 3);
       }
-      const activeBalls = ricochet ? this.ricochet.render(now, pixels) : undefined;
+      let activeBalls;
+      if (ricochet) activeBalls = this.ricochet.render(now, pixels);
+      if (bouncyBall) activeBalls = this.bouncyBall.render(now, pixels);
       const activeOrbits = drain ? this.drain.render(now, pixels) : undefined;
       let activeWaves;
       if (reflection) activeWaves = this.reflection.render(now, pixels);
       if (interference) activeWaves = interference.render(now,pixels,this.interferenceColors,this.getInterferenceRandom());
       const result = applyBudget(pixels, budgetMa, this.idleUa, this.channelUa);
-      if (ricochet) result.activeBalls = activeBalls;
+      if (ricochet || bouncyBall) result.activeBalls = activeBalls;
       if (drain) result.activeOrbits = activeOrbits;
       if (reflection || interference) result.activeWaves = activeWaves;
       return result;
@@ -1865,7 +2002,7 @@ function validateProject(p){
   if((p.shape==="grid"||p.shape==="hex")&&p.rows*p.cols!==rings.length)throw Error("Ring count does not match grid dimensions.");
   if(!Array.isArray(p.patterns)||p.patterns.length>100)throw Error("Invalid pattern collection.");
   const patterns=p.patterns.map(validatePattern);
-  if(typeof p.mode!=="string"||!(/^(?:[0-9]|1[01])$/.test(p.mode)||(/^u\d+$/.test(p.mode)&&Number(p.mode.slice(1))<patterns.length)))throw Error("Unknown active pattern.");
+  if(typeof p.mode!=="string"||!(/^(?:[0-9]|1[012])$/.test(p.mode)||(/^u\d+$/.test(p.mode)&&Number(p.mode.slice(1))<patterns.length)))throw Error("Unknown active pattern.");
   if(typeof p.name!=="string"||p.name.length>80)throw Error("Invalid project name.");
   const project={format:p.format,version:1,name:p.name,shape:p.shape,rows:p.rows,cols:p.cols,count:p.count,spacing:p.spacing,budget:p.budget,mode:p.mode,rings,patterns};
   if(Object.hasOwn(p,"placement")){
@@ -1960,10 +2097,11 @@ ${marks.join('\n')}
   const icons={folder:"M3 6h6l2 2h10v10H3z",download:"M12 3v11m-4-4 4 4 4-4M4 15v5h16v-5",play:"m8 5 11 7-11 7z",pause:"M8 5v14M16 5v14",layout:"M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z",wave:"M2 12h4l3-8 5 16 3-8h5",sliders:"M3 7h7m4 0h7M3 17h11m4 0h3M10 4v6m5 4v6",pointer:"m5 3 14 11-7 1-3 7z",touch:"M9 15V7a2 2 0 0 1 4 0v6l2-2 5 3-2 7h-7l-6-7 2-2z",move:"M12 2v20M2 12h20M9 5l3-3 3 3M9 19l3 3 3-3M5 9l-3 3 3 3M19 9l3 3-3 3",plus:"M12 5v14M5 12h14",minus:"M4 12h16",undo:"M8 4 3 9l5 5M3 9h11a6 6 0 0 1 0 12"};
   const drawIcon=name=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+icons[name]+'"/></svg>';
   document.querySelectorAll("[data-icon]").forEach(el=>el.innerHTML=drawIcon(el.dataset.icon));
-  const modes=["Ripple","Spinner","Solid","Confetti","Three-dot gear","Fire","Surface","Ricochet","Drain","Reflection","Interference","Reflected Interference"];
+  const modes=["Ripple","Spinner","Solid","Confetti","Three-dot gear","Fire","Surface","Ricochet","Drain","Reflection","Interference","Reflected Interference","Bouncy Ball"];
   const descriptions=["A colored wave spreads from each spring to its neighbors.","A comet circles the touched ring and fades after release.","Touched rings hold their color, then fade out.","Color sparks scatter around each touched ring.","Three bright teeth rotate around the touched ring.","Amber embers flicker across the touched ring.","A square wave expands around each touch.","Each pluck launches a colored ball. It rebounds off the outer edge, leaves a short trail, and fades. Brush several springs to fill the table.","A colored trail spirals inward from each pluck. It spins faster as it tightens, flashes white at the center, then fades to black.","A ripple spreads to the outer edges. A paler echo races back to the spring you touched."];
   descriptions.push("Each spring sends a train of ripples. Crests and troughs take the two palette colors. Equal, opposite waves cancel to black.");
   descriptions.push("Each ripple bounces once at the edge. Returning crests strengthen outgoing crests and cancel equal troughs. Pick two springs to launch both together.");
+  descriptions.push("Each pluck drops a randomly colored ball under gravity. Higher drops bounce higher and last longer. Each bounce loses energy until the ball settles and fades.");
   const usesPairedWaves = mode => mode==="10" || mode==="11";
   const shapeNames={grid:"Grid",hex:"Hex lattice",circle:"Circle",spiral:"Spiral",custom:"Custom"};
   const key="springtable-studio-project-v1";
@@ -2065,7 +2203,7 @@ ${marks.join('\n')}
     project.mode=id;custom=id[0]==="u"?runtimePattern(project.patterns[Number(id.slice(1))]):null;
     if(scene)scene.setMode(id[0]==="u"?0:Number(id));
     $("pattern").value=id;
-    $("effect-count").hidden=!["7","8","9"].includes(id) && !usesPairedWaves(id);
+    $("effect-count").hidden=!["7","8","9","12"].includes(id) && !usesPairedWaves(id);
     $("pick-pair").hidden=!usesPairedWaves(id);
     $("pick-pair").disabled=project.rings.length<2;
     $("interference-colors").hidden=!usesPairedWaves(id);
@@ -2246,7 +2384,8 @@ ${marks.join('\n')}
   function startDemo(){cancelPair();resetScene();demo=true;demoStart=simNow;lastDemoBeat=-1;paused=false;updateActions();}
   function tickDemo(){
     const pairDemo=usesPairedWaves(project.mode);
-    const beatMs=pairDemo?3400:230;
+    const ballDemo=project.mode==="12";
+    const beatMs=pairDemo?3400:ballDemo?900:230;
     const elapsed=simNow-demoStart,beat=Math.floor(elapsed/beatMs);
     if(beat!==lastDemoBeat){
       releaseSource("demo");lastDemoBeat=beat;
@@ -2256,7 +2395,9 @@ ${marks.join('\n')}
       const cycle=beat%12;
       const hit=(fx,fy,except=-1)=>{const x=minX+fx*(maxX-minX),y=minY+fy*(maxY-minY);let id=-1,best=Infinity;
         rings.forEach((r,i)=>{const d=(r.x-x)**2+(r.y-y)**2;if(i!==except&&d<best){best=d;id=i;}});if(id>=0)setContact(id,"demo",true);return id;};
-      if(pairDemo){
+      if(ballDemo){
+        if(cycle<8)hit(.2+(cycle%4)*.2, cycle%2 ? .65 : .08);
+      }else if(pairDemo){
         scene.beginInterferenceGroup();
         const horizontal=maxX-minX>=maxY-minY;
         const first=hit(horizontal ? 0.28 : 0.5, horizontal ? 0.5 : 0.28);
@@ -2283,7 +2424,7 @@ ${marks.join('\n')}
     const f=frameResult;board.draw(f.pixels,new Set(contacts.keys()));
     if(!$("effect-count").hidden){
       const n=f.activeWaves??f.activeOrbits??f.activeBalls??0;
-      const noun=project.mode==="7"?"ball":project.mode==="8"?"orbit":"wave";
+      const noun=["7","12"].includes(project.mode)?"ball":project.mode==="8"?"orbit":"wave";
       const label=n+" active "+noun+(n===1?"":"s");
       if($("effect-count").textContent!==label)$("effect-count").textContent=label;
     }

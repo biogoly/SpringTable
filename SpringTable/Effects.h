@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include "Config.h"
+#include "BouncyBall.h"
 #include "Drain.h"
 #include "Interference.h"
 #include "Reflection.h"
@@ -27,7 +28,7 @@ inline void add(Color &dest, Color c) {
 
 enum Mode : uint8_t {
   Ripple, Spinner, Solid, Confetti, Gear, Fire, Surface, Ricochet, Drain,
-  Reflection, Interference, ReflectedInterference
+  Reflection, Interference, ReflectedInterference, BouncyBall
 };
 
 template<unsigned Rows, unsigned Cols>
@@ -47,6 +48,7 @@ class Scene {
   Touch touches_[Rows * Cols] = {};
   Ring rings_[Rows * Cols] = {};
   ricochet::Field<Rows, Cols, Color> ricochet_;
+  bouncyball::Field<Rows, Cols, Color> bouncyBall_;
   drain::Field<Rows, Cols, Color> drain_;
   reflection::Field<Rows, Cols, Color> reflection_;
   interference::Field<Rows, Cols, Color> interference_;
@@ -140,8 +142,9 @@ public:
   }
 
   void setMode(uint8_t mode) {
-    if (mode > ReflectedInterference || mode == mode_) return;
+    if (mode > BouncyBall || mode == mode_) return;
     if (mode == Ricochet || mode_ == Ricochet) ricochet_.clear();
+    if (mode == BouncyBall || mode_ == BouncyBall) bouncyBall_.clear();
     if (mode == Drain || mode_ == Drain) drain_.clear();
     if (mode == Reflection || mode_ == Reflection) reflection_.clear();
     if (mode == Reflection) reflection_.prepare();
@@ -154,6 +157,7 @@ public:
   }
 
   void setRicochetSeed(uint32_t seed) { ricochet_.setSeed(seed); }
+  void setBouncyBallSeed(uint32_t seed) { bouncyBall_.setSeed(seed); }
 
   void press(unsigned row, unsigned col, uint32_t now) {
     if (row >= Rows || col >= Cols) return;
@@ -161,6 +165,7 @@ public:
     if (mode_ >= Ricochet && touch.held) return;
     touch.color = ink(colorIndex_++);
     if (mode_ == Ricochet) ricochet_.launch(row, col, now, ink);
+    if (mode_ == BouncyBall) bouncyBall_.launch(row, col, now, ink);
     if (mode_ == Drain) drain_.launch(row, col, now, touch.color);
     if (mode_ == Reflection) reflection_.launch(row, col, now, touch.color);
     if (usesInterference(mode_)) {
@@ -189,6 +194,7 @@ public:
   // Prepare once for the whole table. Each wave visits at most 25 nearby rings.
   void frame(uint32_t now) {
     if (mode_ == Ricochet) ricochet_.frame(now);
+    if (mode_ == BouncyBall) bouncyBall_.frame(now);
     if (mode_ == Drain) drain_.frame(now);
     if (mode_ == Reflection) reflection_.frame(now);
     if (usesInterference(mode_)) interference_.frame(now, wavePalette_);
@@ -220,6 +226,7 @@ public:
   Color pixel(unsigned row, unsigned col, unsigned led, uint32_t now) const {
     if (row >= Rows || col >= Cols || led >= 16) return {};
     if (mode_ == Ricochet) return ricochet_.pixel(row, col, led);
+    if (mode_ == BouncyBall) return bouncyBall_.pixel(row, col, led);
     if (mode_ == Drain) return drain_.pixel(row, col, led);
     if (mode_ == Reflection) return reflection_.ring(row, col);
     if (usesInterference(mode_)) return interference_.ring(row, col);

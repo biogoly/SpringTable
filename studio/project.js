@@ -115,7 +115,7 @@ function validateProject(p){
   if((p.shape==="grid"||p.shape==="hex")&&p.rows*p.cols!==rings.length)throw Error("Ring count does not match grid dimensions.");
   if(!Array.isArray(p.patterns)||p.patterns.length>100)throw Error("Invalid pattern collection.");
   const patterns=p.patterns.map(validatePattern);
-  if(typeof p.mode!=="string"||!(/^(?:[0-9]|1[01])$/.test(p.mode)||(/^u\d+$/.test(p.mode)&&Number(p.mode.slice(1))<patterns.length)))throw Error("Unknown active pattern.");
+  if(typeof p.mode!=="string"||!(/^(?:[0-9]|1[012])$/.test(p.mode)||(/^u\d+$/.test(p.mode)&&Number(p.mode.slice(1))<patterns.length)))throw Error("Unknown active pattern.");
   if(typeof p.name!=="string"||p.name.length>80)throw Error("Invalid project name.");
   const project={format:p.format,version:1,name:p.name,shape:p.shape,rows:p.rows,cols:p.cols,count:p.count,spacing:p.spacing,budget:p.budget,mode:p.mode,rings,patterns};
   if(Object.hasOwn(p,"placement")){

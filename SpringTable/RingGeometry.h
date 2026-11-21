@@ -15,6 +15,37 @@ inline double xOffset(unsigned p) {
 
 inline double yOffset(unsigned p) { return -xOffset(p + 4); }
 
+// A moving spot stays visible across gaps by measuring falloff relative to
+// its nearest physical emitter. All rings use the same 60 mm grid.
+template<unsigned Rows, unsigned Cols>
+struct GridSpot {
+  double x, y, nearest2, lightRadius2;
+
+  static int nearestIndex(double position, unsigned count) {
+    int index = static_cast<int>(floor(position / 60 + 0.5));
+    if (index < 0) return 0;
+    return index < static_cast<int>(count) ? index : static_cast<int>(count) - 1;
+  }
+
+  static GridSpot at(double x, double y, double lightRadius) {
+    double nearest2 = 0;
+    for (unsigned p = 0; p < 16; ++p) {
+      const double ox = xOffset(p), oy = yOffset(p);
+      const int c = nearestIndex(x - ox, Cols), r = nearestIndex(y - oy, Rows);
+      const double dx = c * 60 + ox - x, dy = r * 60 + oy - y;
+      const double d2 = dx * dx + dy * dy;
+      if (p == 0 || d2 < nearest2) nearest2 = d2;
+    }
+    return {x, y, nearest2, lightRadius * lightRadius};
+  }
+
+  double weight(double emitterX, double emitterY) const {
+    const double dx = emitterX - x, dy = emitterY - y;
+    const double value = 1 - (dx * dx + dy * dy - nearest2) / lightRadius2;
+    return value <= 0 ? 0 : (value >= 1 ? 1 : value);
+  }
+};
+
 // Equal displacements on the stock 60 mm grid share one distance and one
 // 600 mm/s travel time. Both field modes use the same immutable table.
 template<unsigned Rows, unsigned Cols>

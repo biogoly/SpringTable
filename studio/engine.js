@@ -97,6 +97,7 @@
       this.heldCount = 0;
       this.mode = 0;
       this.ricochet = null;
+      this.bouncyBall = null;
       this.drain = null;
       this.reflection = null;
       this.interference = null;
@@ -104,6 +105,7 @@
       this.interferenceColors = undefined;
       this.interferencePalette = null;
       this.ricochetSeed = calibration.ricochetSeed;
+      this.bouncyBallSeed = calibration.bouncyBallSeed;
       // Geometry is fixed for the life of a Scene. Coordinates and distances are mm.
       // Cache both metrics once so simultaneous plucks only evaluate the envelopes.
       this.distances = this.rings.map(source => {
@@ -118,9 +120,10 @@
     }
 
     setMode(mode) {
-      if (!Number.isInteger(mode) || mode < 0 || mode > 11 || this.mode === mode) return;
+      if (!Number.isInteger(mode) || mode < 0 || mode > 12 || this.mode === mode) return;
       if (this.interferencePalette) this.interferencePalette.group = null;
       if (this.ricochet && (this.mode === 7 || mode === 7)) this.ricochet.balls.length = 0;
+      if (this.bouncyBall && (this.mode === 12 || mode === 12)) this.bouncyBall.balls.length = 0;
       if (this.drain && (this.mode === 8 || mode === 8)) this.drain.orbits.length = 0;
       if (this.reflection && (this.mode === 9 || mode === 9)) this.reflection.waves.length = 0;
       if (this.interference && (this.mode === 10 || mode === 10)) this.interference.waves.length = 0;
@@ -139,12 +142,25 @@
         }
         this.ricochet = new window.SpringRicochet(this.rings, PALETTE, seed);
       }
+      if (mode === 12 && !this.bouncyBall) {
+        let seed = this.bouncyBallSeed;
+        if (seed === undefined) {
+          seed = globalThis.crypto?.getRandomValues(new Uint32Array(1))[0] ??
+                 Math.floor(Math.random() * 0x100000000);
+        }
+        this.bouncyBall = new window.SpringBouncyBall(this.rings, PALETTE, seed);
+      }
       this.mode = mode;
     }
 
     setRicochetSeed(seed) {
       this.ricochetSeed = seed >>> 0;
       this.ricochet?.setSeed(this.ricochetSeed);
+    }
+
+    setBouncyBallSeed(seed) {
+      this.bouncyBallSeed = seed >>> 0;
+      this.bouncyBall?.setSeed(this.bouncyBallSeed);
     }
 
     setInterferenceColors(crest, trough) {
@@ -191,6 +207,7 @@
       if (!touch) return;
       if (this.mode >= 7 && touch.held) return;
       if (this.mode === 7) this.ricochet.launch(this.rings[index], now);
+      if (this.mode === 12) this.bouncyBall.launch(this.rings[index], now);
       touch.color = PALETTE[this.colorIndex % PALETTE.length];
       if (this.mode === 8) this.drain.launch(this.rings[index], touch.color, now);
       if (this.mode === 9) this.reflection.launch(index, touch.color, now);
@@ -284,6 +301,7 @@
       }
       const custom = customDefinition && !formula ? customWave(customDefinition) : null;
       const ricochet = !customDefinition && this.mode === 7;
+      const bouncyBall = !customDefinition && this.mode === 12;
       const drain = !customDefinition && this.mode === 8;
       const reflection = !customDefinition && this.mode === 9;
       const interference = !customDefinition && (this.mode === 10 ? this.interference :
@@ -311,13 +329,15 @@
         const color = colors.subarray(i * 3, i * 3 + 3);
         for (let p = 0; p < PIXELS; ++p) pixels.set(color, (i * PIXELS + p) * 3);
       }
-      const activeBalls = ricochet ? this.ricochet.render(now, pixels) : undefined;
+      let activeBalls;
+      if (ricochet) activeBalls = this.ricochet.render(now, pixels);
+      if (bouncyBall) activeBalls = this.bouncyBall.render(now, pixels);
       const activeOrbits = drain ? this.drain.render(now, pixels) : undefined;
       let activeWaves;
       if (reflection) activeWaves = this.reflection.render(now, pixels);
       if (interference) activeWaves = interference.render(now,pixels,this.interferenceColors,this.getInterferenceRandom());
       const result = applyBudget(pixels, budgetMa, this.idleUa, this.channelUa);
-      if (ricochet) result.activeBalls = activeBalls;
+      if (ricochet || bouncyBall) result.activeBalls = activeBalls;
       if (drain) result.activeOrbits = activeOrbits;
       if (reflection || interference) result.activeWaves = activeWaves;
       return result;

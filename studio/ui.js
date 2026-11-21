@@ -4,10 +4,11 @@
   const icons={folder:"M3 6h6l2 2h10v10H3z",download:"M12 3v11m-4-4 4 4 4-4M4 15v5h16v-5",play:"m8 5 11 7-11 7z",pause:"M8 5v14M16 5v14",layout:"M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z",wave:"M2 12h4l3-8 5 16 3-8h5",sliders:"M3 7h7m4 0h7M3 17h11m4 0h3M10 4v6m5 4v6",pointer:"m5 3 14 11-7 1-3 7z",touch:"M9 15V7a2 2 0 0 1 4 0v6l2-2 5 3-2 7h-7l-6-7 2-2z",move:"M12 2v20M2 12h20M9 5l3-3 3 3M9 19l3 3 3-3M5 9l-3 3 3 3M19 9l3 3-3 3",plus:"M12 5v14M5 12h14",minus:"M4 12h16",undo:"M8 4 3 9l5 5M3 9h11a6 6 0 0 1 0 12"};
   const drawIcon=name=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+icons[name]+'"/></svg>';
   document.querySelectorAll("[data-icon]").forEach(el=>el.innerHTML=drawIcon(el.dataset.icon));
-  const modes=["Ripple","Spinner","Solid","Confetti","Three-dot gear","Fire","Surface","Ricochet","Drain","Reflection","Interference","Reflected Interference"];
+  const modes=["Ripple","Spinner","Solid","Confetti","Three-dot gear","Fire","Surface","Ricochet","Drain","Reflection","Interference","Reflected Interference","Bouncy Ball"];
   const descriptions=["A colored wave spreads from each spring to its neighbors.","A comet circles the touched ring and fades after release.","Touched rings hold their color, then fade out.","Color sparks scatter around each touched ring.","Three bright teeth rotate around the touched ring.","Amber embers flicker across the touched ring.","A square wave expands around each touch.","Each pluck launches a colored ball. It rebounds off the outer edge, leaves a short trail, and fades. Brush several springs to fill the table.","A colored trail spirals inward from each pluck. It spins faster as it tightens, flashes white at the center, then fades to black.","A ripple spreads to the outer edges. A paler echo races back to the spring you touched."];
   descriptions.push("Each spring sends a train of ripples. Crests and troughs take the two palette colors. Equal, opposite waves cancel to black.");
   descriptions.push("Each ripple bounces once at the edge. Returning crests strengthen outgoing crests and cancel equal troughs. Pick two springs to launch both together.");
+  descriptions.push("Each pluck drops a randomly colored ball under gravity. Higher drops bounce higher and last longer. Each bounce loses energy until the ball settles and fades.");
   const usesPairedWaves = mode => mode==="10" || mode==="11";
   const shapeNames={grid:"Grid",hex:"Hex lattice",circle:"Circle",spiral:"Spiral",custom:"Custom"};
   const key="springtable-studio-project-v1";
@@ -109,7 +110,7 @@
     project.mode=id;custom=id[0]==="u"?runtimePattern(project.patterns[Number(id.slice(1))]):null;
     if(scene)scene.setMode(id[0]==="u"?0:Number(id));
     $("pattern").value=id;
-    $("effect-count").hidden=!["7","8","9"].includes(id) && !usesPairedWaves(id);
+    $("effect-count").hidden=!["7","8","9","12"].includes(id) && !usesPairedWaves(id);
     $("pick-pair").hidden=!usesPairedWaves(id);
     $("pick-pair").disabled=project.rings.length<2;
     $("interference-colors").hidden=!usesPairedWaves(id);
@@ -290,7 +291,8 @@
   function startDemo(){cancelPair();resetScene();demo=true;demoStart=simNow;lastDemoBeat=-1;paused=false;updateActions();}
   function tickDemo(){
     const pairDemo=usesPairedWaves(project.mode);
-    const beatMs=pairDemo?3400:230;
+    const ballDemo=project.mode==="12";
+    const beatMs=pairDemo?3400:ballDemo?900:230;
     const elapsed=simNow-demoStart,beat=Math.floor(elapsed/beatMs);
     if(beat!==lastDemoBeat){
       releaseSource("demo");lastDemoBeat=beat;
@@ -300,7 +302,9 @@
       const cycle=beat%12;
       const hit=(fx,fy,except=-1)=>{const x=minX+fx*(maxX-minX),y=minY+fy*(maxY-minY);let id=-1,best=Infinity;
         rings.forEach((r,i)=>{const d=(r.x-x)**2+(r.y-y)**2;if(i!==except&&d<best){best=d;id=i;}});if(id>=0)setContact(id,"demo",true);return id;};
-      if(pairDemo){
+      if(ballDemo){
+        if(cycle<8)hit(.2+(cycle%4)*.2, cycle%2 ? .65 : .08);
+      }else if(pairDemo){
         scene.beginInterferenceGroup();
         const horizontal=maxX-minX>=maxY-minY;
         const first=hit(horizontal ? 0.28 : 0.5, horizontal ? 0.5 : 0.28);
@@ -327,7 +331,7 @@
     const f=frameResult;board.draw(f.pixels,new Set(contacts.keys()));
     if(!$("effect-count").hidden){
       const n=f.activeWaves??f.activeOrbits??f.activeBalls??0;
-      const noun=project.mode==="7"?"ball":project.mode==="8"?"orbit":"wave";
+      const noun=["7","12"].includes(project.mode)?"ball":project.mode==="8"?"orbit":"wave";
       const label=n+" active "+noun+(n===1?"":"s");
       if($("effect-count").textContent!==label)$("effect-count").textContent=label;
     }
